@@ -4,9 +4,7 @@ version = "0.1.0"
 description = "Tiny file IO utility library for Python powered by Pydantic"
 authors = [{ name = "杜世橋 Du Shiqiao", email = "lucidfrontier.45@gmail.com" }]
 requires-python = ">=3.11"
-dependencies = [
-    "pydantic>=2.7.4",
-]
+dependencies = ["pydantic>=2.7.4"]
 
 [build-system]
 requires = ["hatchling"]
@@ -68,6 +66,6 @@ exclude = ["tests/**/*", "deps/**/*"]
 
 [tool.pyright]
 pythonVersion = "3.11"
-typeCheckingMode = "basic"
+typeCheckingMode = "standard"
 # add directory names to exclude from analysis
 ignore = ["deps"]
