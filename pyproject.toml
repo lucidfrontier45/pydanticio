@@ -1,16 +1,12 @@
 [project]
-name = "python-rye-template"
+name = "pydanticio"
 version = "0.1.0"
-description = "A Project Template of Python with Rye"
+description = "Tiny file IO utility library for Python powered by Pydantic"
 authors = [{ name = "杜世橋 Du Shiqiao", email = "lucidfrontier.45@gmail.com" }]
-dependencies = ["fastapi>=0.110.1"]
 requires-python = ">=3.11"
-
-[project.optional-dependencies]
-server = ["uvicorn[standard]>=0.29.0"]
-
-[project.scripts]
-app = "app.cli:main"
+dependencies = [
+    "pydantic>=2.7.4",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -20,7 +16,7 @@ build-backend = "hatchling.build"
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/app"]
+packages = ["src/pydanticio"]
 
 [tool.rye]
 managed = true
@@ -36,7 +32,7 @@ pyright_lint = "pyright ."
 rye_format = "rye format ."
 rye_lint = "rye lint ."
 rye_fix = "rye lint --fix ."
-test = "pytest tests -n auto --cov=app --cov-report=term --cov-report=xml"
+test = "pytest tests --cov=pydanticio --cov-report=term --cov-report=xml"
 format = { chain = ["rye_fix", "rye_format"] }
 lint = { chain = ["rye_lint", "pyright_lint"] }
 check = { chain = ["format", "lint", "test"] }
@@ -60,7 +56,6 @@ select = [
     "SIM",
     "A",
     "S",
-    "COM",
     "DTZ",
     "PIE",
     "PLE",
