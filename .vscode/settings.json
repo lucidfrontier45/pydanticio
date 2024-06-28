@@ -17,8 +17,8 @@
     ],
     // disable unittests
     "python.testing.unittestEnabled": false,
-    // run pylint with 'basic' mode
+    // run pylance with 'basic' mode
     "python.analysis.typeCheckingMode": "standard",
-    // run pylint on all files in the workspace
+    // run pylance on all files in the workspace
     "python.analysis.diagnosticMode": "workspace",
 }
