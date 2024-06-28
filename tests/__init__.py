@@ -10,6 +10,12 @@ class TestClass(BaseModel):
     x: float
     y: float
 
+    def get_csv_header(self):
+        return "a,b,s,x,y"
+
+    def to_csv_row(self):
+        return f"{self.a},{self.b},{self.s},{self.x},{self.y}"
+
 
 test_records = [
     TestClass(a=1, b=2, s="hello", x=3.14, y=2.71),
