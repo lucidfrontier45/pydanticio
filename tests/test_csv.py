@@ -1,7 +1,6 @@
-import csv
 from io import StringIO
 
-from pydanticio.csv import read, write
+from pydanticio import read_records_from_reader, write_records_to_writer
 
 from . import TestClass, test_records
 
@@ -17,11 +16,11 @@ records_str = "\r\n".join(
 
 def test_read_records_from_reader():
     reader = StringIO(records_str)
-    records = read(reader, TestClass)
+    records = read_records_from_reader(reader, TestClass, "csv")
     assert records == test_records
 
 
 def test_write_records_to_writer():
     writer = StringIO()
-    write(writer, test_records)
+    write_records_to_writer(writer, test_records, "csv")
     assert writer.getvalue().strip() == records_str.strip()
