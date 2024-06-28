@@ -5,12 +5,12 @@ from typing import TextIO
 from .common import T
 
 
-def read(reader: TextIO, model: type[T]) -> list[T]:
+def read_records(reader: TextIO, model: type[T]) -> list[T]:
     csv_reader = csv.DictReader(reader)
     return [model.model_validate(row) for row in csv_reader]
 
 
-def write(writer: TextIO, records: Iterable[T]) -> None:
+def write_records(writer: TextIO, records: Iterable[T]) -> None:
     it = iter(records)
     first_record = next(it)
     fields = list(first_record.model_fields.keys())
