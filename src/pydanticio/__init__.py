@@ -14,7 +14,7 @@ GenericBackendType = Literal["json"]
 LinesOnlyBackendType = Literal["csv", "json_lines"]
 
 
-def _decide_backend_type_from_path(
+def decide_backend_type_from_path(
     file_path: Path,
 ) -> GenericBackendType | LinesOnlyBackendType:
     match file_path.suffix.lower():
