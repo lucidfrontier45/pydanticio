@@ -10,7 +10,12 @@ from . import json_lines as jsl_backend
 from .common import T
 from .version import __version__
 
-GenericDataFormat = Literal["json"]
+try:
+    from . import yaml as yaml_backend
+except ImportError:
+    from . import yaml_stub as yaml_backend
+
+GenericDataFormat = Literal["json", "yaml"]
 LinesOnlyDataFormat = Literal["csv", "json_lines"]
 DataFormat = GenericDataFormat | LinesOnlyDataFormat
 
@@ -25,6 +30,8 @@ def decide_data_format_from_path(
             return "json_lines"
         case ".json":
             return "json"
+        case ".yaml" | ".yml":
+            return "yaml"
         case _:
             raise ValueError(f"Unsupported file extension: {file_path.suffix}")
 
@@ -35,6 +42,8 @@ def read_record_from_reader(
     match data_format:
         case "json":
             return json_backend.read_record(reader, model)
+        case "yaml":
+            return yaml_backend.read_record(reader, model)
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -59,6 +68,8 @@ def read_records_from_reader(
             return jsl_backend.read_records(reader, model)
         case "json":
             return json_backend.read_record(reader, list_model).root
+        case "yaml":
+            return yaml_backend.read_record(reader, list_model).root
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -76,6 +87,8 @@ def write_record_to_writer(
     match data_format:
         case "json":
             json_backend.write_record(writer, record)
+        case "yaml":
+            yaml_backend.write_record(writer, record)
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -100,6 +113,8 @@ def write_records_to_writer(
             jsl_backend.write_records(writer, records)
         case "json":
             json_backend.write_record(writer, list_model(root=records))
+        case "yaml":
+            yaml_backend.write_record(writer, list_model(root=records))
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
