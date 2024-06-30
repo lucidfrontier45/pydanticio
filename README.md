@@ -5,13 +5,20 @@ This library is a port of the Rust library [SerdeIO](https://github.com/lucidfro
 
 # Install
 
-`pip install pydanticio`
+```sh
+# standard distribution
+pip install pydanticio
+
+# with YAML backend
+pip install pydanticio[yaml]
+```
 
 # Supported Formats
 
 - CSV by stdlib `csv` module
 - JSON by stdlib `json` module
 - JSON Lines by stdlib `json` module
+- YAML by `pyyaml` library, it is an optional feature and you need enable it manually at when you install it.
 
 # Usage
 
