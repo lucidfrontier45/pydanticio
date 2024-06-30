@@ -16,6 +16,6 @@ def write_records(writer: TextIO, records: Iterable[T]) -> None:
     fields = list(first_record.model_fields.keys())
     csv_writer = csv.DictWriter(writer, fieldnames=fields)
     csv_writer.writeheader()
-    csv_writer.writerow(first_record.model_dump())
+    csv_writer.writerow(first_record.model_dump(mode="json"))
     for record in it:
-        csv_writer.writerow(record.model_dump())
+        csv_writer.writerow(record.model_dump(mode="json"))
