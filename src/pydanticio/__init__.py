@@ -4,16 +4,16 @@ from typing import Literal, TextIO, TypeAlias
 
 from pydantic import BaseModel, RootModel
 
-from . import csv as csv_backend
-from . import json as json_backend
-from . import json_lines as jsl_backend
-from .common import T
+from .backends import csv as csv_backend
+from .backends import json as json_backend
+from .backends import json_lines as jsl_backend
+from .backends.common import T
 from .version import __version__
 
 try:
-    from . import yaml as yaml_backend
+    from .backends import yaml as yaml_backend
 except ImportError:
-    from . import yaml_stub as yaml_backend
+    from .backends import yaml_stub as yaml_backend
 
 GenericDataFormat = Literal["json", "yaml"]
 LinesOnlyDataFormat = Literal["csv", "json_lines"]
