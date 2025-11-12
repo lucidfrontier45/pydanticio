@@ -29,8 +29,7 @@ yaml = ["pyyaml>=5.1.0"]
 dev = [
     "pyright>=1.1.358",
     "pytest-cov>=7.0.0",
-    "uvicorn>=0.29.0",
-    "pytest-xdist>=3.5.0",
+    "ruff>=0.14.4",
 ]
 
 [build-system]
