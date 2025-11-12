@@ -133,3 +133,4 @@ dmypy.json
 !.vscode/extensions.json
 requirements-dev.lock
 requirements.lock
+uv.lock
