@@ -3,7 +3,7 @@ name = "pydanticio"
 version = "0.2.0"
 description = "A Tiny file IO utility library for Python powered by Pydantic"
 authors = [{ name = "杜世橋 Du Shiqiao", email = "lucidfrontier.45@gmail.com" }]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = ["pydantic>=2.5.0"]
 license = { text = "MIT" }
 readme = "README.md"
@@ -15,7 +15,6 @@ classifiers = [
     "Topic :: Utilities",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
@@ -45,7 +44,7 @@ managed = true
 filterwarnings = ["ignore::FutureWarning"]
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = [
@@ -71,7 +70,7 @@ exclude = ["tests/**/*", "deps/**/*"]
 "*/__init__.py" = ['F401']
 
 [tool.pyright]
-pythonVersion = "3.11"
+pythonVersion = "3.12"
 typeCheckingMode = "standard"
 # add directory names to exclude from analysis
 ignore = ["deps"]

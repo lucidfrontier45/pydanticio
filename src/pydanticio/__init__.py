@@ -1,13 +1,12 @@
-from collections.abc import Callable, Iterable
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Literal, TextIO, TypeAlias
+from typing import Literal, TextIO
 
 from pydantic import BaseModel, RootModel
 
 from .backends import csv as csv_backend
 from .backends import json as json_backend
 from .backends import json_lines as jsl_backend
-from .backends.common import T
 from .version import __version__
 
 try:
@@ -36,7 +35,7 @@ def decide_data_format_from_path(
             raise ValueError(f"Unsupported file extension: {file_path.suffix}")
 
 
-def read_record_from_reader(
+def read_record_from_reader[T: BaseModel](
     reader: TextIO, model: type[T], data_format: GenericDataFormat
 ) -> T:
     match data_format:
@@ -48,14 +47,14 @@ def read_record_from_reader(
             raise ValueError(f"Unsupported backend type: {data_format}")
 
 
-def read_record_from_file(file_path: str | Path, model: type[T]) -> T:
+def read_record_from_file[T: BaseModel](file_path: str | Path, model: type[T]) -> T:
     file_path = Path(file_path)
     data_format: GenericDataFormat = decide_data_format_from_path(file_path)  # type: ignore
     with file_path.open() as reader:
         return read_record_from_reader(reader, model, data_format)
 
 
-def read_records_from_reader(
+def read_records_from_reader[T: BaseModel](
     reader: TextIO,
     model: type[T],
     data_format: DataFormat,
@@ -74,7 +73,9 @@ def read_records_from_reader(
             raise ValueError(f"Unsupported backend type: {data_format}")
 
 
-def read_records_from_file(file_path: str | Path, model: type[T]) -> list[T]:
+def read_records_from_file[T: BaseModel](
+    file_path: str | Path, model: type[T]
+) -> list[T]:
     file_path = Path(file_path)
     data_format = decide_data_format_from_path(file_path)
     with file_path.open() as reader:
@@ -100,7 +101,7 @@ def write_record_to_file(file_path: str | Path, record: BaseModel) -> None:
         write_record_to_writer(writer, record, data_format)
 
 
-def write_records_to_writer(
+def write_records_to_writer[T: BaseModel](
     writer: TextIO,
     records: Iterable[T],
     data_format: DataFormat,
@@ -119,7 +120,7 @@ def write_records_to_writer(
             raise ValueError(f"Unsupported backend type: {data_format}")
 
 
-def write_records_to_file(file_path: str | Path, records: Iterable[T]) -> None:
+def write_records_to_file(file_path: str | Path, records: Iterable[BaseModel]) -> None:
     file_path = Path(file_path)
     data_format = decide_data_format_from_path(file_path)
     with file_path.open("w") as writer:

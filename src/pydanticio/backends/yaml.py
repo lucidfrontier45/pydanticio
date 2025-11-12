@@ -3,10 +3,8 @@ from typing import TextIO
 import yaml
 from pydantic import BaseModel
 
-from .common import T
 
-
-def read_record(reader: TextIO, model: type[T]) -> T:
+def read_record[T: BaseModel](reader: TextIO, model: type[T]) -> T:
     data = yaml.safe_load(reader)
     return model.model_validate(data)
 

@@ -2,10 +2,8 @@ from typing import TextIO
 
 from pydantic import BaseModel
 
-from .common import T
 
-
-def read_record(reader: TextIO, model: type[T]) -> T:
+def read_record[T: BaseModel](reader: TextIO, model: type[T]) -> T:
     data = reader.read()
     return model.model_validate_json(data)
 
