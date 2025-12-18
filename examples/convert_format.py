@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+
 from pydanticio import read_records_from_file, write_records_to_file
 
 
