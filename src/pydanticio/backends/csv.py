@@ -13,7 +13,7 @@ def read_records[T: BaseModel](reader: TextIO, model: type[T]) -> list[T]:
 def write_records(writer: TextIO, records: Iterable[BaseModel]) -> None:
     it = iter(records)
     first_record = next(it)
-    fields = list(first_record.model_fields.keys())
+    fields = list(type(first_record).model_fields.keys())
     csv_writer = csv.DictWriter(writer, fieldnames=fields)
     csv_writer.writeheader()
     csv_writer.writerow(first_record.model_dump(mode="json"))
