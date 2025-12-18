@@ -17,8 +17,6 @@
     ],
     // disable unittests
     "python.testing.unittestEnabled": false,
-    // run pylance with 'basic' mode
-    "python.analysis.typeCheckingMode": "standard",
-    // run pylance on all files in the workspace
-    "python.analysis.diagnosticMode": "workspace",
+    // disable language server, we use pyrefly instead
+    "python.languageServer": "None"
 }

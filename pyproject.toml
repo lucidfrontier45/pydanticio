@@ -26,7 +26,7 @@ keywords = ["pydantic", "io", "file", "utility", "library"]
 yaml = ["pyyaml>=5.1.0"]
 
 [dependency-groups]
-dev = ["pyright>=1.1.358", "pytest-cov>=7.0.0", "ruff>=0.14.4"]
+dev = ["pyrefly>=0.46.0", "pytest-cov>=7.0.0", "ruff>=0.14.4"]
 
 [build-system]
 requires = ["uv_build>=0.9.5,<0.10.0"]
@@ -64,8 +64,7 @@ exclude = ["tests/**/*", "deps/**/*"]
 [tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ['F401']
 
-[tool.pyright]
-pythonVersion = "3.12"
-typeCheckingMode = "standard"
-# add directory names to exclude from analysis
-ignore = ["deps"]
+[tool.pyrefly]
+python-version = "3.12"
+search-path = ["src", "tests"]
+
