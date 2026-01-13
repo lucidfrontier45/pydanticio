@@ -59,7 +59,7 @@ select = [
     "PLE",
 ]
 # add directory names to exclude from analysis
-exclude = ["tests/**/*", "deps/**/*"]
+exclude = ["tests/**/*", "deps/**/*", "README.md", "AGENTS.md"]
 
 [tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ['F401']

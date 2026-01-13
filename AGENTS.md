@@ -4,8 +4,8 @@
 PydanticIO is a tiny file IO utility library for Python powered by Pydantic. It provides functions to read and write Pydantic models from/to various data formats: CSV, JSON, JSON Lines, and YAML.
 
 ## Code and Command Execution
-The Project is managed by `uv`. Scripts and tools including `ruff`, `pytest`, and `pyrefly` should be invoked by `uv`. 
-Example: `uv run main.py`, `uv run ruff check`
+The Project is managed by `uv`. Scripts and tools including `ruff`, `pytest`, and `pyrefly` should be invoked by `uv`.
+Example: `uv run ruff check`, `uv run pytest`
 
 ## Code Structure
 - `src/pydanticio/`: Main package
@@ -27,24 +27,23 @@ Example: `uv run main.py`, `uv run ruff check`
 - Backends follow consistent `read_record`/`write_record` or `read_records`/`write_records` patterns
 
 ## Testing
-Run tests with: `pytest`
+Run tests with: `uv run pytest`
 - Tests in `tests/` directory
 - Each backend has its own test file
 - Uses pytest fixtures and StringIO for testing
 
 ## Linting and Type Checking
-- Linting: `ruff check .`
-- Type checking: `pyrefly check src`
-- Run both of them
+- Linting: `uv run ruff check .`
+- Type checking: `uv run pyrefly check src`
 - Configuration in `pyproject.toml`
 
 ## Code Formatting
-- Auto Fixing: `ruff check . --fix`
-- Formatting: `ruff format .`
-- Run both of them
+- Auto Fixing: `uv run ruff check . --fix`
+- Formatting: `uv run ruff format .`
 - Configuration in `pyproject.toml`
 
 ## Dependencies
+- Python: >=3.12
 - Core: pydantic>=2.5.0
 - Optional: pyyaml>=5.1.0 for YAML support
 - Dev: pyrefly>=0.46.0, pytest-cov>=7.0.0, ruff>=0.14.4
@@ -58,9 +57,9 @@ Uses uv for building and dependency management. Build with `uv build`.
 - Format auto-detection from file extension (.csv, .json, .jsonl/.jsl/.jl/.json_lines, .yaml/.yml)
 - All backends use Pydantic's validation and serialization methods
 - Library is designed to be simple and minimal, following the pattern of the Rust SerdeIO library
+- Reader/writer functions work with `BinaryIO`, file path functions auto-handle opening/closing
 
 ## Common Patterns
 - For single records: use `read_record_from_file` / `write_record_to_file`
 - For lists: use `read_records_from_file` / `write_records_to_file`
 - Format can be specified explicitly or auto-detected from path
-- All functions work with TextIO streams or file paths
