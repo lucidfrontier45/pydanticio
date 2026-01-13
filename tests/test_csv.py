@@ -1,4 +1,4 @@
-from io import StringIO
+from io import BytesIO
 
 from pydanticio import read_records_from_reader, write_records_to_writer
 
@@ -15,12 +15,12 @@ records_str = "\r\n".join(
 
 
 def test_read_records_from_reader():
-    reader = StringIO(records_str)
+    reader = BytesIO(records_str.encode("utf-8"))
     records = read_records_from_reader(reader, TestClass, "csv")
     assert records == test_records
 
 
 def test_write_records_to_writer():
-    writer = StringIO()
+    writer = BytesIO()
     write_records_to_writer(writer, test_records, "csv")
-    assert writer.getvalue().strip() == records_str.strip()
+    assert writer.getvalue().decode("utf-8").strip() == records_str.strip()
