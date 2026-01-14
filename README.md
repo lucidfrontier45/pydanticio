@@ -60,6 +60,18 @@ write_records_to_file("output.json", users)
 
 All text-based formats use UTF-8 encoding.
 
+### Newline Handling
+
+Text-based formats handle newlines according to their respective specifications:
+
+| Format      | Line Ending | Notes                              |
+| ----------- | ----------- | ---------------------------------- |
+| CSV         | `\r\n`      | Uses CRLF per RFC 4180             |
+| JSON        | `\n`        | Uses LF line endings               |
+| JSON Lines  | `\n`        | Uses LF line endings per RFC 7464  |
+| TOML        | Platform    | Uses default TextIOWrapper behavior |
+| YAML        | `\n`        | Uses LF line endings               |
+
 ## API Reference
 
 ### Reading
