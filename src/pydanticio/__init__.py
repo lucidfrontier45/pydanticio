@@ -59,7 +59,9 @@ def read_record_from_reader[T: BaseModel](
 ) -> T:
     match data_format:
         case "json" | "yaml":
-            with detach_on_exit(TextIOWrapper(reader, encoding="utf-8")) as text_reader:
+            with detach_on_exit(
+                TextIOWrapper(reader, encoding="utf-8", newline="\n")
+            ) as text_reader:
                 match data_format:
                     case "json":
                         return json_backend.read_record(text_reader, model)
@@ -94,7 +96,9 @@ def read_records_from_reader[T: BaseModel](
     list_model = RootModel[list[model]]
     match data_format:
         case "csv" | "json_lines" | "json" | "yaml":
-            with detach_on_exit(TextIOWrapper(reader, encoding="utf-8")) as text_reader:
+            with detach_on_exit(
+                TextIOWrapper(reader, encoding="utf-8", newline="\n")
+            ) as text_reader:
                 match data_format:
                     case "csv":
                         return csv_backend.read_records(text_reader, model)
@@ -126,7 +130,9 @@ def write_record_to_writer(
 ) -> None:
     match data_format:
         case "json" | "yaml":
-            with detach_on_exit(TextIOWrapper(writer, encoding="utf-8")) as text_writer:
+            with detach_on_exit(
+                TextIOWrapper(writer, encoding="utf-8", newline="\n")
+            ) as text_writer:
                 match data_format:
                     case "json":
                         json_backend.write_record(text_writer, record)
@@ -164,7 +170,9 @@ def write_records_to_writer[T: BaseModel](
 
     match data_format:
         case "csv" | "json_lines" | "json" | "yaml":
-            with detach_on_exit(TextIOWrapper(writer, encoding="utf-8")) as text_writer:
+            with detach_on_exit(
+                TextIOWrapper(writer, encoding="utf-8", newline="\n")
+            ) as text_writer:
                 match data_format:
                     case "csv":
                         csv_backend.write_records(text_writer, records)

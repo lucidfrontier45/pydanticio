@@ -10,4 +10,4 @@ def read_record[T: BaseModel](reader: TextIO, model: type[T]) -> T:
 
 
 def write_record(writer: TextIO, record: BaseModel) -> None:
-    yaml.safe_dump(record.model_dump(mode="json"), writer)
+    yaml.safe_dump(record.model_dump(mode="json"), writer, line_break="\n")
