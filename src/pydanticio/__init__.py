@@ -9,14 +9,20 @@ from pydantic import BaseModel, RootModel
 from .backends import csv as csv_backend
 from .backends import json as json_backend
 from .backends import json_lines as jsl_backend
-from .version import __version__
+
+try:
+    from .backends import messagepack as messagepack_backend
+except ImportError:
+    from .backends import messagepack_stub as messagepack_backend
 
 try:
     from .backends import yaml as yaml_backend
 except ImportError:
     from .backends import yaml_stub as yaml_backend
 
-GenericDataFormat = Literal["json", "yaml"]
+from .version import __version__
+
+GenericDataFormat = Literal["json", "yaml", "messagepack"]
 LinesOnlyDataFormat = Literal["csv", "json_lines"]
 DataFormat = GenericDataFormat | LinesOnlyDataFormat
 
@@ -42,6 +48,8 @@ def decide_data_format_from_path(
             return "json"
         case ".yaml" | ".yml":
             return "yaml"
+        case ".msgpack":
+            return "messagepack"
         case _:
             raise ValueError(f"Unsupported file extension: {file_path.suffix}")
 
@@ -58,10 +66,11 @@ def read_record_from_reader[T: BaseModel](
                     case "yaml":
                         return yaml_backend.read_record(text_reader, model)
                     case _:
-                        # This branch is unreachable due to the outer match
                         raise ValueError(
                             f"Unreachable: invalid data_format {data_format}"
                         )
+        case "messagepack":
+            return messagepack_backend.read_record(reader, model)
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -80,7 +89,6 @@ def read_records_from_reader[T: BaseModel](
 ) -> list[T]:
     list_model = RootModel[list[model]]
     match data_format:
-        # text formats only
         case "csv" | "json_lines" | "json" | "yaml":
             with detach_on_exit(TextIOWrapper(reader, encoding="utf-8")) as text_reader:
                 match data_format:
@@ -93,10 +101,11 @@ def read_records_from_reader[T: BaseModel](
                     case "yaml":
                         return yaml_backend.read_record(text_reader, list_model).root
                     case _:
-                        # This branch is unreachable due to the outer match
                         raise ValueError(
                             f"Unreachable: invalid data_format {data_format}"
                         )
+        case "messagepack":
+            return messagepack_backend.read_records(reader, model)
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -114,7 +123,6 @@ def write_record_to_writer(
     writer: BinaryIO, record: BaseModel, data_format: GenericDataFormat
 ) -> None:
     match data_format:
-        # text formats only
         case "json" | "yaml":
             with detach_on_exit(TextIOWrapper(writer, encoding="utf-8")) as text_writer:
                 match data_format:
@@ -123,10 +131,11 @@ def write_record_to_writer(
                     case "yaml":
                         yaml_backend.write_record(text_writer, record)
                     case _:
-                        # This branch is unreachable due to the outer match
                         raise ValueError(
                             f"Unreachable: invalid data_format {data_format}"
                         )
+        case "messagepack":
+            messagepack_backend.write_record(writer, record)
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -146,7 +155,6 @@ def write_records_to_writer[T: BaseModel](
     list_model = RootModel[Iterable[T]]
 
     match data_format:
-        # text formats only
         case "csv" | "json_lines" | "json" | "yaml":
             with detach_on_exit(TextIOWrapper(writer, encoding="utf-8")) as text_writer:
                 match data_format:
@@ -159,10 +167,11 @@ def write_records_to_writer[T: BaseModel](
                     case "yaml":
                         yaml_backend.write_record(text_writer, list_model(root=records))
                     case _:
-                        # This branch is unreachable due to the outer match
                         raise ValueError(
                             f"Unreachable: invalid data_format {data_format}"
                         )
+        case "messagepack":
+            messagepack_backend.write_records(writer, list(records))
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
