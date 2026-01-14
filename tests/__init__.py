@@ -1,4 +1,7 @@
+import os
 from pydantic import BaseModel, ConfigDict
+
+PLATFORM_NEWLINE = "\n" if os.name != "nt" else "\r\n"
 
 
 class SampleRecord(BaseModel):

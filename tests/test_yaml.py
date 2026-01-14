@@ -19,9 +19,7 @@ def test_read_record_from_reader():
 
 
 def test_read_list_of_records_from_reader():
-    data = yaml.safe_dump([record.model_dump() for record in test_records]).encode(
-        "utf-8"
-    )
+    data = yaml.safe_dump([record.model_dump() for record in test_records]).encode("utf-8")
     reader = BytesIO(data)
     records = read_records_from_reader(reader, SampleRecord, "yaml")
     assert records == test_records
@@ -35,9 +33,7 @@ def test_write_record_to_writer():
 
 
 def test_write_list_of_records_to_writer():
-    data = yaml.safe_dump([record.model_dump() for record in test_records]).encode(
-        "utf-8"
-    )
+    data = yaml.safe_dump([record.model_dump() for record in test_records]).encode("utf-8")
     writer = BytesIO()
     write_records_to_writer(writer, test_records, "yaml")
     assert writer.getvalue() == data

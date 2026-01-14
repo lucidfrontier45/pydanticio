@@ -24,9 +24,7 @@ keywords = ["pydantic", "io", "file", "utility", "library"]
 
 [project.optional-dependencies]
 yaml = ["pyyaml>=5.1.0"]
-messagepack = [
-    "msgpack>=1.1.2",
-]
+messagepack = ["msgpack>=1.1.2"]
 
 [dependency-groups]
 dev = [
@@ -56,6 +54,7 @@ filterwarnings = ["ignore::FutureWarning"]
 
 [tool.ruff]
 target-version = "py312"
+line-length = 100
 
 [tool.ruff.lint]
 select = [
