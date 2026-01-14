@@ -1,6 +1,6 @@
 [project]
 name = "pydanticio"
-version = "0.3.1"
+version = "0.4.0"
 description = "A Tiny file IO utility library for Python powered by Pydantic"
 authors = [{ name = "杜世橋 Du Shiqiao", email = "lucidfrontier.45@gmail.com" }]
 requires-python = ">=3.12"
@@ -25,9 +25,7 @@ keywords = ["pydantic", "io", "file", "utility", "library"]
 [project.optional-dependencies]
 yaml = ["pyyaml>=5.1.0"]
 messagepack = ["msgpack>=1.1.2"]
-toml = [
-    "tomlkit>=0.14.0",
-]
+toml = ["tomlkit>=0.14.0"]
 
 [dependency-groups]
 dev = [
