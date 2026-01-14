@@ -1,7 +1,7 @@
-# PydanticIO
+<img src="logo.png" alt="PydanticIO Logo" width="500" />
 
 [![PyPI Version](https://img.shields.io/pypi/v/pydanticio)](https://pypi.org/project/pydanticio/)
-[![Python Versions](https://img.shields.io/pypi/python-version/pydanticio)](https://pypi.org/project/pydanticio/)
+[![Python Versions](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/pypi/l/pydanticio)](https://github.com/lucidfrontier45/pydanticio/blob/main/LICENSE)
 
 A tiny file IO utility library for Python powered by [Pydantic](https://docs.pydantic.dev/). This library is a port of the Rust library [SerdeIO](https://github.com/lucidfrontier45/serdeio).
@@ -43,12 +43,12 @@ write_records_to_file("output.json", users)
 
 ## Supported Formats
 
-| Format   | File Extensions     | Single Record | List of Records |
-|----------|---------------------|---------------|-----------------|
-| CSV      | `.csv`              | No            | Yes             |
-| JSON     | `.json`             | Yes           | Yes             |
-| JSON Lines | `.jsonl`, `.jl`, `.jsl`, `.json_lines` | No | Yes |
-| YAML     | `.yaml`, `.yml`     | Yes           | Yes             |
+| Format     | File Extensions                        | Single Record | List of Records |
+| ---------- | -------------------------------------- | ------------- | --------------- |
+| CSV        | `.csv`                                 | No            | Yes             |
+| JSON       | `.json`                                | Yes           | Yes             |
+| JSON Lines | `.jsonl`, `.jl`, `.jsl`, `.json_lines` | No            | Yes             |
+| YAML       | `.yaml`, `.yml`                        | Yes           | Yes             |
 
 All text-based formats use UTF-8 encoding.
 
@@ -56,21 +56,21 @@ All text-based formats use UTF-8 encoding.
 
 ### Reading
 
-| Function | Description | Supported Formats |
-|----------|-------------|-------------------|
-| `read_record_from_reader(reader, model, format)` | Read single record from `BinaryIO` | JSON, YAML |
-| `read_record_from_file(path, model)` | Read single record from file path | JSON, YAML |
-| `read_records_from_reader(reader, model, format)` | Read list of records from `BinaryIO` | All formats |
-| `read_records_from_file(path, model)` | Read list of records from file path | All formats |
+| Function                                          | Description                          | Supported Formats |
+| ------------------------------------------------- | ------------------------------------ | ----------------- |
+| `read_record_from_reader(reader, model, format)`  | Read single record from `BinaryIO`   | JSON, YAML        |
+| `read_record_from_file(path, model)`              | Read single record from file path    | JSON, YAML        |
+| `read_records_from_reader(reader, model, format)` | Read list of records from `BinaryIO` | All formats       |
+| `read_records_from_file(path, model)`             | Read list of records from file path  | All formats       |
 
 ### Writing
 
-| Function | Description | Supported Formats |
-|----------|-------------|-------------------|
-| `write_record_to_writer(writer, record, format)` | Write single record to `BinaryIO` | JSON, YAML |
-| `write_record_to_file(path, record)` | Write single record to file path | JSON, YAML |
-| `write_records_to_writer(writer, records, format)` | Write list of records to `BinaryIO` | All formats |
-| `write_records_to_file(path, records)` | Write list of records to file path | All formats |
+| Function                                           | Description                         | Supported Formats |
+| -------------------------------------------------- | ----------------------------------- | ----------------- |
+| `write_record_to_writer(writer, record, format)`   | Write single record to `BinaryIO`   | JSON, YAML        |
+| `write_record_to_file(path, record)`               | Write single record to file path    | JSON, YAML        |
+| `write_records_to_writer(writer, records, format)` | Write list of records to `BinaryIO` | All formats       |
+| `write_records_to_file(path, records)`             | Write list of records to file path  | All formats       |
 
 ### Format Detection
 
