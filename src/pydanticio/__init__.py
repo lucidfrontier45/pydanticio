@@ -1,6 +1,8 @@
 from collections.abc import Iterable
+from contextlib import contextmanager
+from io import TextIOWrapper
 from pathlib import Path
-from typing import Literal, TextIO
+from typing import BinaryIO, Literal
 
 from pydantic import BaseModel, RootModel
 
@@ -17,6 +19,15 @@ except ImportError:
 GenericDataFormat = Literal["json", "yaml"]
 LinesOnlyDataFormat = Literal["csv", "json_lines"]
 DataFormat = GenericDataFormat | LinesOnlyDataFormat
+
+
+@contextmanager
+def detach_on_exit(wrapper: TextIOWrapper):
+    try:
+        yield wrapper
+    finally:
+        if not wrapper.closed:
+            wrapper.detach()
 
 
 def decide_data_format_from_path(
@@ -36,13 +47,21 @@ def decide_data_format_from_path(
 
 
 def read_record_from_reader[T: BaseModel](
-    reader: TextIO, model: type[T], data_format: GenericDataFormat
+    reader: BinaryIO, model: type[T], data_format: GenericDataFormat
 ) -> T:
     match data_format:
-        case "json":
-            return json_backend.read_record(reader, model)
-        case "yaml":
-            return yaml_backend.read_record(reader, model)
+        case "json" | "yaml":
+            with detach_on_exit(TextIOWrapper(reader, encoding="utf-8")) as text_reader:
+                match data_format:
+                    case "json":
+                        return json_backend.read_record(text_reader, model)
+                    case "yaml":
+                        return yaml_backend.read_record(text_reader, model)
+                    case _:
+                        # This branch is unreachable due to the outer match
+                        raise ValueError(
+                            f"Unreachable: invalid data_format {data_format}"
+                        )
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -50,25 +69,34 @@ def read_record_from_reader[T: BaseModel](
 def read_record_from_file[T: BaseModel](file_path: str | Path, model: type[T]) -> T:
     file_path = Path(file_path)
     data_format: GenericDataFormat = decide_data_format_from_path(file_path)  # type: ignore
-    with file_path.open() as reader:
+    with file_path.open("rb") as reader:
         return read_record_from_reader(reader, model, data_format)
 
 
 def read_records_from_reader[T: BaseModel](
-    reader: TextIO,
+    reader: BinaryIO,
     model: type[T],
     data_format: DataFormat,
 ) -> list[T]:
     list_model = RootModel[list[model]]
     match data_format:
-        case "csv":
-            return csv_backend.read_records(reader, model)
-        case "json_lines":
-            return jsl_backend.read_records(reader, model)
-        case "json":
-            return json_backend.read_record(reader, list_model).root
-        case "yaml":
-            return yaml_backend.read_record(reader, list_model).root
+        # text formats only
+        case "csv" | "json_lines" | "json" | "yaml":
+            with detach_on_exit(TextIOWrapper(reader, encoding="utf-8")) as text_reader:
+                match data_format:
+                    case "csv":
+                        return csv_backend.read_records(text_reader, model)
+                    case "json_lines":
+                        return jsl_backend.read_records(text_reader, model)
+                    case "json":
+                        return json_backend.read_record(text_reader, list_model).root
+                    case "yaml":
+                        return yaml_backend.read_record(text_reader, list_model).root
+                    case _:
+                        # This branch is unreachable due to the outer match
+                        raise ValueError(
+                            f"Unreachable: invalid data_format {data_format}"
+                        )
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -78,18 +106,27 @@ def read_records_from_file[T: BaseModel](
 ) -> list[T]:
     file_path = Path(file_path)
     data_format = decide_data_format_from_path(file_path)
-    with file_path.open() as reader:
+    with file_path.open("rb") as reader:
         return read_records_from_reader(reader, model, data_format)
 
 
 def write_record_to_writer(
-    writer: TextIO, record: BaseModel, data_format: GenericDataFormat
+    writer: BinaryIO, record: BaseModel, data_format: GenericDataFormat
 ) -> None:
     match data_format:
-        case "json":
-            json_backend.write_record(writer, record)
-        case "yaml":
-            yaml_backend.write_record(writer, record)
+        # text formats only
+        case "json" | "yaml":
+            with detach_on_exit(TextIOWrapper(writer, encoding="utf-8")) as text_writer:
+                match data_format:
+                    case "json":
+                        json_backend.write_record(text_writer, record)
+                    case "yaml":
+                        yaml_backend.write_record(text_writer, record)
+                    case _:
+                        # This branch is unreachable due to the outer match
+                        raise ValueError(
+                            f"Unreachable: invalid data_format {data_format}"
+                        )
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -97,25 +134,35 @@ def write_record_to_writer(
 def write_record_to_file(file_path: str | Path, record: BaseModel) -> None:
     file_path = Path(file_path)
     data_format: GenericDataFormat = decide_data_format_from_path(file_path)  # type: ignore
-    with file_path.open("w") as writer:
+    with file_path.open("wb") as writer:
         write_record_to_writer(writer, record, data_format)
 
 
 def write_records_to_writer[T: BaseModel](
-    writer: TextIO,
+    writer: BinaryIO,
     records: Iterable[T],
     data_format: DataFormat,
 ) -> None:
     list_model = RootModel[Iterable[T]]
+
     match data_format:
-        case "csv":
-            csv_backend.write_records(writer, records)
-        case "json_lines":
-            jsl_backend.write_records(writer, records)
-        case "json":
-            json_backend.write_record(writer, list_model(root=records))
-        case "yaml":
-            yaml_backend.write_record(writer, list_model(root=records))
+        # text formats only
+        case "csv" | "json_lines" | "json" | "yaml":
+            with detach_on_exit(TextIOWrapper(writer, encoding="utf-8")) as text_writer:
+                match data_format:
+                    case "csv":
+                        csv_backend.write_records(text_writer, records)
+                    case "json_lines":
+                        jsl_backend.write_records(text_writer, records)
+                    case "json":
+                        json_backend.write_record(text_writer, list_model(root=records))
+                    case "yaml":
+                        yaml_backend.write_record(text_writer, list_model(root=records))
+                    case _:
+                        # This branch is unreachable due to the outer match
+                        raise ValueError(
+                            f"Unreachable: invalid data_format {data_format}"
+                        )
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -123,5 +170,5 @@ def write_records_to_writer[T: BaseModel](
 def write_records_to_file(file_path: str | Path, records: Iterable[BaseModel]) -> None:
     file_path = Path(file_path)
     data_format = decide_data_format_from_path(file_path)
-    with file_path.open("w") as writer:
+    with file_path.open("wb") as writer:
         write_records_to_writer(writer, records, data_format)

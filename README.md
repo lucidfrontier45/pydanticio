@@ -18,16 +18,16 @@ pip install pydanticio[yaml]
 - CSV by stdlib `csv` module
 - JSON by stdlib `json` module
 - JSON Lines by stdlib `json` module
-- YAML by `pyyaml` library, it is an optional feature and you need enable it manually at when you install it.
+- YAML by `pyyaml` library (optional feature)
 
 # Usage
 
-- `read_record_from_reader` is used to read a type `T` which is a subclass of `pydantic.BaseModel` from `TextIO`. Data format must be specified by `DataFormat` literals.
-- `read_records_from_reader` always tries to deserialize the data as `list[T]`.
-- `read_record_from_file` and `read_records_from_file` accepts a `Path`. Data format is automatically determined by file extension.
+- `read_record_from_reader` reads a single `T` (subclass of `pydantic.BaseModel`) from `BinaryIO`. Data format must be `json` or `yaml`.
+- `read_records_from_reader` reads `list[T]` from `BinaryIO`. Supports all formats: `csv`, `json_lines`, `json`, `yaml`.
+- `read_record_from_file` and `read_records_from_file` accept a `Path`. Data format is auto-detected from file extension.
 - `write_*` functions follow the same rules as `read_*`.
 
-Note that some data format like CSV and JSON Lines support only reading records `list[T]`.
+Note: CSV and JSON Lines only support lists of records, not single records. All text-based formats (CSV, JSON, JSON Lines, YAML) are read from and written to files using UTF-8 encoding.
 
 # Examples
 
