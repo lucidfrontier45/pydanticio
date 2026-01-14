@@ -13,5 +13,5 @@ def read_record[T: BaseModel](reader: BinaryIO, model: type[T]) -> T:
 
 
 def write_record(writer: BinaryIO, record: BaseModel) -> None:
-    with managed_text_io(writer, encoding="utf-8", newline="\n") as text_writer:
+    with managed_text_io(writer, encoding="utf-8", newline="") as text_writer:
         yaml.safe_dump(record.model_dump(mode="json"), text_writer, line_break="\n")

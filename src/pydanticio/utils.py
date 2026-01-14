@@ -1,6 +1,9 @@
+import os
 from contextlib import contextmanager
 from io import TextIOWrapper
 from typing import BinaryIO
+
+PLATFORM_NEWLINE = "\r\n" if os.name == "nt" else "\n"
 
 
 @contextmanager
