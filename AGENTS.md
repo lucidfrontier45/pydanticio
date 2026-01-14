@@ -16,6 +16,7 @@ The Project is managed by `uv`. Run tools via `uv run`.
 - Do NOT add comments unless explicitly requested
 - Always use type hints for function signatures
 - Use Python generics (`T: BaseModel`) for type-safe record handling
+- Avoid using `# type: ignore` comments - fix type issues properly instead
 
 ### Naming
 - snake_case for functions and variables
