@@ -27,6 +27,20 @@ PydanticIO (pronounce pidantisio) is a tiny file IO utility library for Python p
 - **Backend Pattern**: Format-specific implementations in `backends/` directory
 - **Stub Pattern**: YAML stub for graceful handling when pyyaml is not installed
 
+## File Structure
+```
+src/pydanticio/
+├── __init__.py          # Main API with public functions
+├── backends/
+│   ├── __init__.py      # Backend exports and utilities
+│   ├── csv.py           # CSV backend (lists only)
+│   ├── json.py          # JSON backend (single + lists)
+│   ├── json_lines.py    # JSON Lines backend (lists only)
+│   ├── yaml.py          # YAML backend (single + lists, requires pyyaml)
+│   └── yaml_stub.py     # YAML stub when pyyaml unavailable
+└── version.py           # Version info
+```
+
 ## API Functions
 - `read_record_from_reader`: Read single record from TextIO
 - `read_records_from_reader`: Read list of records from TextIO
@@ -42,3 +56,10 @@ PydanticIO (pronounce pidantisio) is a tiny file IO utility library for Python p
 - JSON and YAML support both single records and lists
 - Format can be specified explicitly or auto-detected from path
 - All backends use Pydantic's `model_validate` and `model_dump`/`model_dump_json` methods
+- Reader/writer functions work with `BinaryIO`, file path functions auto-handle opening/closing
+- Format auto-detection from file extension (.csv, .json, .jsonl/.jsl/.jl/.json_lines, .yaml/.yml)
+
+## Common Patterns
+- For single records: use `read_record_from_file` / `write_record_to_file`
+- For lists: use `read_records_from_file` / `write_records_to_file`
+- Format can be specified explicitly or auto-detected from path

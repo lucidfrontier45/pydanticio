@@ -26,7 +26,12 @@ keywords = ["pydantic", "io", "file", "utility", "library"]
 yaml = ["pyyaml>=5.1.0"]
 
 [dependency-groups]
-dev = ["pyrefly>=0.46.0", "pytest-cov>=7.0.0", "ruff>=0.14.4"]
+dev = [
+    "poethepoet>=0.40.0",
+    "pyrefly>=0.46.0",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.11",
+]
 
 [build-system]
 requires = ["uv_build>=0.9.5,<0.10.0"]
@@ -34,6 +39,14 @@ build-backend = "uv_build"
 
 [tool.uv]
 managed = true
+
+[tool.poe.tasks]
+ruff_check = "ruff check --fix ."
+ruff_format = "ruff format ."
+pyrefly_check = "pyrefly check ."
+check = ["ruff_check", "pyrefly_check"]
+format = ["ruff_format"]
+test = "pytest tests --cov=pydanticio --cov-report=term --cov-report=xml"
 
 [tool.pytest.ini_options]
 filterwarnings = ["ignore::FutureWarning"]
@@ -67,4 +80,3 @@ exclude = ["tests/**/*", "deps/**/*", "README.md", "AGENTS.md"]
 [tool.pyrefly]
 python-version = "3.12"
 search-path = ["src", "tests"]
-

@@ -5,12 +5,13 @@ PydanticIO is a tiny file IO utility library for Python powered by Pydantic. It 
 
 ## Code and Command Execution
 The Project is managed by `uv`. Scripts and tools including `ruff`, `pytest`, and `pyrefly` should be invoked by `uv`.
-Example: `uv run ruff check`, `uv run pytest`
+Example: `uv run poe check`, `uv run poe test`
 
 ## Code Structure
 - `src/pydanticio/`: Main package
   - `__init__.py`: Main API functions (`read_record_from_*`, `read_records_from_*`, `write_record_to_*`, `write_records_to_*`)
   - `backends/`: Format-specific implementations
+    - `__init__.py`: Backend exports and utilities
     - `csv.py`: CSV handling (only supports lists of records)
     - `json.py`: JSON handling for single records and lists
     - `json_lines.py`: JSON Lines handling (only supports lists of records)
@@ -27,19 +28,18 @@ Example: `uv run ruff check`, `uv run pytest`
 - Backends follow consistent `read_record`/`write_record` or `read_records`/`write_records` patterns
 
 ## Testing
-Run tests with: `uv run pytest`
+Run tests with: `uv run poe test`
 - Tests in `tests/` directory
 - Each backend has its own test file
 - Uses pytest fixtures and BytesIO for testing
 
 ## Linting and Type Checking
-- Linting: `uv run ruff check .`
-- Type checking: `uv run pyrefly check src`
+- Linting: `uv run poe check` (it also tries to auto-fix issues)
+- Type checking: `uv run poe pyrefly_check`
 - Configuration in `pyproject.toml`
 
 ## Code Formatting
-- Auto Fixing: `uv run ruff check . --fix`
-- Formatting: `uv run ruff format .`
+- Formatting: `uv run poe format`
 - Configuration in `pyproject.toml`
 
 ## Dependencies

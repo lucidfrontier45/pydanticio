@@ -64,21 +64,18 @@ ruff format . --check
 ## Type Checking
 
 ```bash
-# Type check source and tests
-pyrefly check src
-
-# Type check specific directory
-pyrefly check src/pydanticio/
+# Type check source and tests (via poe task runner)
+uv run poe check
 ```
 
 ## Combined Quality Checks
 
 ```bash
 # Run linting, formatting check, and type checking
-ruff check . && ruff format . --check && pyrefly check src
+ruff check . && ruff format . --check && uv run poe check
 
 # Run all checks and tests
-ruff check . && ruff format . --check && pyrefly check src && pytest
+ruff check . && ruff format . --check && uv run poe check && pytest
 ```
 
 ## Running Examples

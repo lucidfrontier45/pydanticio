@@ -1,5 +1,13 @@
 # PydanticIO Style and Conventions
 
+## Conventions
+- Uses Pydantic v2 with `model_validate` and `model_dump`
+- Type hints with generics for type safety
+- Match statements for format dispatching
+- RootModel for list serialization in JSON/YAML formats
+- File extensions determine format automatically via `decide_data_format_from_path`
+- Backends follow consistent `read_record`/`write_record` or `read_records`/`write_records` patterns
+
 ## Code Style
 
 ### General Principles
@@ -107,12 +115,13 @@ raise NotImplementedError("yaml backend is not available.")
 src/pydanticio/
 ├── __init__.py          # Main API with public functions
 ├── backends/
-│   ├── csv.py          # CSV backend (lists only)
-│   ├── json.py         # JSON backend (single + lists)
-│   ├── json_lines.py   # JSON Lines backend (lists only)
-│   ├── yaml.py         # YAML backend (single + lists)
-│   └── yaml_stub.py    # YAML stub when pyyaml unavailable
-└── version.py          # Version info
+│   ├── __init__.py      # Backend exports and utilities
+│   ├── csv.py           # CSV backend (lists only)
+│   ├── json.py          # JSON backend (single + lists)
+│   ├── json_lines.py    # JSON Lines backend (lists only)
+│   ├── yaml.py          # YAML backend (single + lists)
+│   └── yaml_stub.py     # YAML stub when pyyaml unavailable
+└── version.py           # Version info
 ```
 
 ## Configuration Files

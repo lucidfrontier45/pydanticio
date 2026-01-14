@@ -2,28 +2,21 @@
 
 ## Before Committing Changes
 
-### 1. Run Linting
+### 1. Run Linting and Type Checking
 ```bash
-ruff check . --fix
+uv run poe check
 ```
-- Auto-fixes most linting issues
+- Auto-fixes most linting issues (via ruff) and type checking (via pyrefly)
 - Check for any remaining issues that require manual attention
 
 ### 2. Run Code Formatting
 ```bash
-ruff format .
+uv run poe format
 ```
-- Ensures consistent code style
+- Ensures consistent code style (via ruff)
 - Run this after linting fixes
 
-### 3. Run Type Checking
-```bash
-pyrefly check src
-```
-- Verifies type correctness
-- Fix any type errors before proceeding
-
-### 4. Run Tests
+### 3. Run Tests
 ```bash
 pytest
 ```
@@ -31,7 +24,7 @@ pytest
 - Add new tests for new functionality
 - Verify coverage with `pytest --cov=pydanticio`
 
-### 5. Verify Build
+### 4. Verify Build
 ```bash
 uv build
 ```
@@ -41,9 +34,8 @@ uv build
 ## Quality Gates
 
 All changes should pass these checks before being considered complete:
-- [ ] `ruff check .` passes with no errors
-- [ ] `ruff format .` makes no changes (code is properly formatted)
-- [ ] `pyrefly check src` passes with no errors
+- [ ] `uv run poe check` passes with no errors (linting + type checking)
+- [ ] `uv run poe format` makes no changes (code is properly formatted)
 - [ ] `pytest` passes all tests
 - [ ] `uv build` succeeds
 
@@ -59,12 +51,12 @@ All changes should pass these checks before being considered complete:
 
 ### Quick Check (before committing)
 ```bash
-ruff check . --fix && ruff format . --check && pyrefly check src && pytest
+uv run poe check && pytest
 ```
 
 ### Full Quality Check
 ```bash
-ruff check . --fix && ruff format . && pyrefly check src && pytest --cov=pydanticio && uv build
+uv run poe check && uv run poe format && pytest --cov=pydanticio && uv build
 ```
 
 ## When Adding New Features
