@@ -9,7 +9,7 @@ A tiny file IO utility library for Python powered by [Pydantic](https://docs.pyd
 ## Features
 
 - **Type-safe**: Read and write Pydantic models with full type inference
-- **Format support**: CSV, JSON, JSON Lines, YAML, and MessagePack (optional)
+- **Format support**: CSV, JSON, JSON Lines, TOML, YAML, and MessagePack (optional)
 - **Auto-detection**: Automatically detects format from file extension
 - **Simple API**: Intuitive functions for single records and lists
 - **Zero dependencies**: Core library only requires Pydantic
@@ -25,6 +25,9 @@ pip install pydanticio[yaml]
 
 # With MessagePack support
 pip install pydanticio[messagepack]
+
+# With TOML support
+pip install pydanticio[toml]
 ```
 
 ## Quick Start
@@ -46,13 +49,14 @@ write_records_to_file("output.json", users)
 
 ## Supported Formats
 
-| Format     | File Extensions                        | Single Record | List of Records |
-| ---------- | -------------------------------------- | ------------- | --------------- |
-| CSV        | `.csv`                                 | No            | Yes             |
-| JSON       | `.json`                                | Yes           | Yes             |
-| JSON Lines | `.jsonl`, `.jl`, `.jsl`, `.json_lines` | No            | Yes             |
-| MessagePack| `.msgpack`                             | Yes           | Yes             |
-| YAML       | `.yaml`, `.yml`                        | Yes           | Yes             |
+| Format      | File Extensions                        | Single Record | List of Records |
+| ----------- | -------------------------------------- | ------------- | --------------- |
+| CSV         | `.csv`                                 | No            | Yes             |
+| JSON        | `.json`                                | Yes           | Yes             |
+| JSON Lines  | `.jsonl`, `.jl`, `.jsl`, `.json_lines` | No            | Yes             |
+| MessagePack | `.msgpack`                             | Yes           | Yes             |
+| TOML        | `.toml`                                | Yes           | No              |
+| YAML        | `.yaml`, `.yml`                        | Yes           | Yes             |
 
 All text-based formats use UTF-8 encoding.
 
@@ -60,21 +64,21 @@ All text-based formats use UTF-8 encoding.
 
 ### Reading
 
-| Function                                          | Description                          | Supported Formats      |
-| ------------------------------------------------- | ------------------------------------ | ---------------------- |
-| `read_record_from_reader(reader, model, format)`  | Read single record from `BinaryIO`   | JSON, MessagePack, YAML|
-| `read_record_from_file(path, model)`              | Read single record from file path    | JSON, MessagePack, YAML|
-| `read_records_from_reader(reader, model, format)` | Read list of records from `BinaryIO` | All formats            |
-| `read_records_from_file(path, model)`             | Read list of records from file path  | All formats            |
+| Function                                          | Description                          | Supported Formats             |
+| ------------------------------------------------- | ------------------------------------ | ----------------------------- |
+| `read_record_from_reader(reader, model, format)`  | Read single record from `BinaryIO`   | JSON, MessagePack, TOML, YAML |
+| `read_record_from_file(path, model)`              | Read single record from file path    | JSON, MessagePack, TOML, YAML |
+| `read_records_from_reader(reader, model, format)` | Read list of records from `BinaryIO` | All formats except for TOML   |
+| `read_records_from_file(path, model)`             | Read list of records from file path  | All formats except for TOML   |
 
 ### Writing
 
-| Function                                           | Description                         | Supported Formats      |
-| -------------------------------------------------- | ----------------------------------- | ---------------------- |
-| `write_record_to_writer(writer, record, format)`   | Write single record to `BinaryIO`   | JSON, MessagePack, YAML|
-| `write_record_to_file(path, record)`               | Write single record to file path    | JSON, MessagePack, YAML|
-| `write_records_to_writer(writer, records, format)` | Write list of records to `BinaryIO` | All formats            |
-| `write_records_to_file(path, records)`             | Write list of records to file path  | All formats            |
+| Function                                           | Description                         | Supported Formats             |
+| -------------------------------------------------- | ----------------------------------- | ----------------------------- |
+| `write_record_to_writer(writer, record, format)`   | Write single record to `BinaryIO`   | JSON, MessagePack, TOML, YAML |
+| `write_record_to_file(path, record)`               | Write single record to file path    | JSON, MessagePack, TOML, YAML |
+| `write_records_to_writer(writer, records, format)` | Write list of records to `BinaryIO` | All formats except for TOML   |
+| `write_records_to_file(path, records)`             | Write list of records to file path  | All formats except for TOML   |
 
 ### Format Detection
 
@@ -118,7 +122,7 @@ class Config(BaseModel):
     version: int
     enabled: bool
 
-config = read_record_from_file("config.json", Config)
+config = read_record_from_file("config.toml", Config)
 print(config.name, config.version)
 ```
 

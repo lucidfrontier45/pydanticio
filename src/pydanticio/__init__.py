@@ -20,11 +20,16 @@ try:
 except ImportError:
     from .backends import yaml_stub as yaml_backend
 
+try:
+    from .backends import toml as toml_backend
+except ImportError:
+    from .backends import toml_stub as toml_backend
+
 from .version import __version__
 
 GenericDataFormat = Literal["json", "yaml", "messagepack"]
+SingleOnlyDataFormat = Literal["toml"]
 LinesOnlyDataFormat = Literal["csv", "json_lines"]
-DataFormat = GenericDataFormat | LinesOnlyDataFormat
 
 
 @contextmanager
@@ -38,7 +43,7 @@ def detach_on_exit(wrapper: TextIOWrapper):
 
 def decide_data_format_from_path(
     file_path: Path,
-) -> DataFormat:
+) -> GenericDataFormat | SingleOnlyDataFormat | LinesOnlyDataFormat:
     match file_path.suffix.lower():
         case ".csv":
             return "csv"
@@ -50,15 +55,17 @@ def decide_data_format_from_path(
             return "yaml"
         case ".msgpack":
             return "messagepack"
+        case ".toml":
+            return "toml"
         case _:
             raise ValueError(f"Unsupported file extension: {file_path.suffix}")
 
 
 def read_record_from_reader[T: BaseModel](
-    reader: BinaryIO, model: type[T], data_format: GenericDataFormat
+    reader: BinaryIO, model: type[T], data_format: GenericDataFormat | SingleOnlyDataFormat
 ) -> T:
     match data_format:
-        case "json" | "yaml":
+        case "json" | "yaml" | "toml":
             with detach_on_exit(
                 TextIOWrapper(reader, encoding="utf-8", newline="\n")
             ) as text_reader:
@@ -67,6 +74,8 @@ def read_record_from_reader[T: BaseModel](
                         return json_backend.read_record(text_reader, model)
                     case "yaml":
                         return yaml_backend.read_record(text_reader, model)
+                    case "toml":
+                        return toml_backend.read_record(text_reader, model)
                     case _:
                         raise ValueError(f"Unreachable: invalid data_format {data_format}")
         case "messagepack":
@@ -76,7 +85,9 @@ def read_record_from_reader[T: BaseModel](
 
 
 def read_record_from_file[T: BaseModel](
-    file_path: str | Path, model: type[T], data_format: GenericDataFormat | None = None
+    file_path: str | Path,
+    model: type[T],
+    data_format: GenericDataFormat | SingleOnlyDataFormat | None = None,
 ) -> T:
     file_path = Path(file_path)
     actual_data_format = data_format or decide_data_format_from_path(file_path)
@@ -91,7 +102,7 @@ def read_record_from_file[T: BaseModel](
 def read_records_from_reader[T: BaseModel](
     reader: BinaryIO,
     model: type[T],
-    data_format: DataFormat,
+    data_format: GenericDataFormat | LinesOnlyDataFormat,
 ) -> list[T]:
     list_model = RootModel[list[model]]
     match data_format:
@@ -117,19 +128,25 @@ def read_records_from_reader[T: BaseModel](
 
 
 def read_records_from_file[T: BaseModel](
-    file_path: str | Path, model: type[T], data_format: DataFormat | None = None
+    file_path: str | Path,
+    model: type[T],
+    data_format: GenericDataFormat | LinesOnlyDataFormat | None = None,
 ) -> list[T]:
     file_path = Path(file_path)
     actual_data_format = data_format or decide_data_format_from_path(file_path)
+    if actual_data_format in ("toml",):
+        raise ValueError(
+            f"Data format {actual_data_format} is not supported for multiple record reading"
+        )
     with file_path.open("rb") as reader:
         return read_records_from_reader(reader, model, actual_data_format)
 
 
 def write_record_to_writer(
-    writer: BinaryIO, record: BaseModel, data_format: GenericDataFormat
+    writer: BinaryIO, record: BaseModel, data_format: GenericDataFormat | SingleOnlyDataFormat
 ) -> None:
     match data_format:
-        case "json" | "yaml":
+        case "json" | "yaml" | "toml":
             with detach_on_exit(
                 TextIOWrapper(writer, encoding="utf-8", newline="\n")
             ) as text_writer:
@@ -138,6 +155,8 @@ def write_record_to_writer(
                         json_backend.write_record(text_writer, record)
                     case "yaml":
                         yaml_backend.write_record(text_writer, record)
+                    case "toml":
+                        toml_backend.write_record(text_writer, record)
                     case _:
                         raise ValueError(f"Unreachable: invalid data_format {data_format}")
         case "messagepack":
@@ -149,7 +168,7 @@ def write_record_to_writer(
 def write_record_to_file(
     file_path: str | Path,
     record: BaseModel,
-    data_format: GenericDataFormat | None = None,
+    data_format: GenericDataFormat | SingleOnlyDataFormat | None = None,
 ) -> None:
     file_path = Path(file_path)
     actual_data_format = data_format or decide_data_format_from_path(file_path)
@@ -164,7 +183,7 @@ def write_record_to_file(
 def write_records_to_writer[T: BaseModel](
     writer: BinaryIO,
     records: Iterable[T],
-    data_format: DataFormat,
+    data_format: GenericDataFormat | LinesOnlyDataFormat,
 ) -> None:
     list_model = RootModel[Iterable[T]]
 
@@ -193,9 +212,13 @@ def write_records_to_writer[T: BaseModel](
 def write_records_to_file(
     file_path: str | Path,
     records: Iterable[BaseModel],
-    data_format: DataFormat | None = None,
+    data_format: GenericDataFormat | LinesOnlyDataFormat | None = None,
 ) -> None:
     file_path = Path(file_path)
     actual_data_format = data_format or decide_data_format_from_path(file_path)
+    if actual_data_format in ("toml",):
+        raise ValueError(
+            f"Data format {actual_data_format} is not supported for multiple record writing"
+        )
     with file_path.open("wb") as writer:
         write_records_to_writer(writer, records, actual_data_format)
