@@ -3,10 +3,10 @@ from io import BytesIO
 
 from pydanticio import read_records_from_reader, write_records_to_writer
 
-from . import SampleRecord, test_records, PLATFORM_NEWLINE
+from . import SampleRecord, test_records
 
 
-records_str = PLATFORM_NEWLINE.join(
+records_str = "\r\n".join(
     [
         test_records[0].get_csv_header(),
         test_records[0].to_csv_row(),
