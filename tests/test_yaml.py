@@ -8,13 +8,13 @@ from pydanticio import (
 )
 import yaml
 
-from . import TestClass, test_records
+from . import SampleRecord, test_records
 
 
 def test_read_record_from_reader():
     data = yaml.safe_dump(test_records[0].model_dump()).encode("utf-8")
     reader = BytesIO(data)
-    record = read_record_from_reader(reader, TestClass, "yaml")
+    record = read_record_from_reader(reader, SampleRecord, "yaml")
     assert record == test_records[0]
 
 
@@ -23,7 +23,7 @@ def test_read_list_of_records_from_reader():
         "utf-8"
     )
     reader = BytesIO(data)
-    records = read_records_from_reader(reader, TestClass, "yaml")
+    records = read_records_from_reader(reader, SampleRecord, "yaml")
     assert records == test_records
 
 

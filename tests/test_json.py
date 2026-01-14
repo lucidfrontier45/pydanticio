@@ -7,13 +7,13 @@ from pydanticio import (
     write_records_to_writer,
 )
 
-from . import TestClass, test_records
+from . import SampleRecord, test_records
 
 
 def test_read_record_from_reader():
     record_str = test_records[0].model_dump_json()
     reader = BytesIO(record_str.encode("utf-8"))
-    record = read_record_from_reader(reader, TestClass, "json")
+    record = read_record_from_reader(reader, SampleRecord, "json")
     assert record == test_records[0]
 
 
@@ -21,7 +21,7 @@ def test_read_list_of_records_from_reader():
     records_str = ",".join(record.model_dump_json() for record in test_records)
     records_str = f"[{records_str}]"
     reader = BytesIO(records_str.encode("utf-8"))
-    records = read_records_from_reader(reader, TestClass, "json")
+    records = read_records_from_reader(reader, SampleRecord, "json")
     assert records == test_records
 
 

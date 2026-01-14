@@ -2,7 +2,7 @@ from io import BytesIO
 
 from pydanticio import read_records_from_reader, write_records_to_writer
 
-from . import TestClass, test_records
+from . import SampleRecord, test_records
 
 
 records_str = "\r\n".join(
@@ -16,7 +16,7 @@ records_str = "\r\n".join(
 
 def test_read_records_from_reader():
     reader = BytesIO(records_str.encode("utf-8"))
-    records = read_records_from_reader(reader, TestClass, "csv")
+    records = read_records_from_reader(reader, SampleRecord, "csv")
     assert records == test_records
 
 
