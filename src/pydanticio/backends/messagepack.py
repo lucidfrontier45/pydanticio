@@ -12,8 +12,7 @@ def read_record[T: BaseModel](reader: BinaryIO, model: type[T]) -> T:
 
 def write_record(writer: BinaryIO, record: BaseModel) -> None:
     data = msgpack.packb(record.model_dump())
-    if data is not None:
-        writer.write(data)
+    writer.write(data)  # type: ignore
 
 
 def read_records[T: BaseModel](reader: BinaryIO, model: type[T]) -> list[T]:
@@ -24,5 +23,4 @@ def read_records[T: BaseModel](reader: BinaryIO, model: type[T]) -> list[T]:
 
 def write_records[T: BaseModel](writer: BinaryIO, records: list[T]) -> None:
     data = msgpack.packb([record.model_dump() for record in records])
-    if data is not None:
-        writer.write(data)
+    writer.write(data)  # type: ignore

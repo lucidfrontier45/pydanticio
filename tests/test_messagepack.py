@@ -26,7 +26,7 @@ def test_read_list_of_records_from_reader():
 
 
 def test_write_record_to_writer():
-    data = msgpack.packb(test_records[0].model_dump())  # type: ignore
+    data = msgpack.packb(test_records[0].model_dump())
     writer = BytesIO()
     write_record_to_writer(writer, test_records[0], "messagepack")
     assert writer.getvalue() == data
