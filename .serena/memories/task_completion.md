@@ -18,7 +18,7 @@ uv run poe format
 
 ### 3. Run Tests
 ```bash
-pytest
+uv run pytest
 ```
 - Ensures all tests pass
 - Add new tests for new functionality
@@ -56,7 +56,7 @@ uv run poe check && pytest
 
 ### Full Quality Check
 ```bash
-uv run poe check && uv run poe format && pytest --cov=pydanticio && uv build
+uv run poe check && uv run poe format && uv run pytest --cov=pydanticio && uv build
 ```
 
 ## When Adding New Features

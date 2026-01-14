@@ -26,56 +26,40 @@ uv run <command>
 
 ```bash
 # Run all tests
-pytest
+uv run pytest
 
 # Run tests with coverage
-pytest --cov=pydanticio
+uv run pytest --cov=pydanticio
 
 # Run specific test file
-pytest tests/test_json.py
+uv run pytest tests/test_json.py
 
 # Run tests in verbose mode
-pytest -v
+uv run pytest -v
 ```
 
-## Linting
+## Linting and Type Checking
 
 ```bash
-# Check for linting errors
-ruff check .
-
-# Auto-fix linting errors
-ruff check . --fix
-
-# Check specific file
-ruff check src/pydanticio/__init__.py
+# Linting and type checking (auto-fix linting errors)
+uv run poe check
 ```
 
 ## Formatting
 
 ```bash
 # Format code
-ruff format .
-
-# Check formatting without changes
-ruff format . --check
-```
-
-## Type Checking
-
-```bash
-# Type check source and tests (via poe task runner)
-uv run poe check
+uv run poe format
 ```
 
 ## Combined Quality Checks
 
 ```bash
 # Run linting, formatting check, and type checking
-ruff check . && ruff format . --check && uv run poe check
+uv run poe check
 
 # Run all checks and tests
-ruff check . && ruff format . --check && uv run poe check && pytest
+uv run poe check && uv run pytest
 ```
 
 ## Running Examples
@@ -123,8 +107,7 @@ grep -r "pattern" --include="*.py"
 ## Development Workflow
 
 1. Make changes to the code
-2. Run `ruff check . --fix` to auto-fix linting issues
-3. Run `ruff format .` to format code
-4. Run `pyrefly check src` to verify types
-5. Run `pytest` to ensure tests pass
-6. Commit changes with clear commit messages
+2. Run `uv run poe check` to auto-fix linting and formatting issues
+3. Run `uv run poe check` to verify types
+4. Run `uv run pytest` to ensure tests pass
+5. Commit changes with clear commit messages
