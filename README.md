@@ -43,6 +43,9 @@ class User(BaseModel):
 # Read from any supported format (auto-detected from extension)
 users = read_records_from_file("users.csv", User)
 
+# Or specify format explicitly (overrides file extension)
+users = read_records_from_file("data.txt", User, data_format="csv")
+
 # Write to any supported format
 write_records_to_file("output.json", users)
 ```
@@ -79,25 +82,25 @@ All text-based formats handle newlines automatically:
 
 ### Reading
 
-| Function                                          | Description                          | Supported Formats             |
-| ------------------------------------------------- | ------------------------------------ | ----------------------------- |
-| `read_record_from_reader(reader, model, format)`  | Read single record from `BinaryIO`   | JSON, MessagePack, TOML, YAML |
-| `read_record_from_file(path, model)`              | Read single record from file path    | JSON, MessagePack, TOML, YAML |
-| `read_records_from_reader(reader, model, format)` | Read list of records from `BinaryIO` | All formats except for TOML   |
-| `read_records_from_file(path, model)`             | Read list of records from file path  | All formats except for TOML   |
+| Function                                                 | Description                          | Supported Formats             |
+| -------------------------------------------------------- | ------------------------------------ | ----------------------------- |
+| `read_record_from_reader(reader, model, format)`         | Read single record from `BinaryIO`   | JSON, MessagePack, TOML, YAML |
+| `read_record_from_file(path, model, data_format=None)`   | Read single record from file path    | JSON, MessagePack, TOML, YAML |
+| `read_records_from_reader(reader, model, format)`        | Read list of records from `BinaryIO` | All formats except for TOML   |
+| `read_records_from_file(path, model, data_format=None)`  | Read list of records from file path  | All formats except for TOML   |
 
 ### Writing
 
-| Function                                           | Description                         | Supported Formats             |
-| -------------------------------------------------- | ----------------------------------- | ----------------------------- |
-| `write_record_to_writer(writer, record, format)`   | Write single record to `BinaryIO`   | JSON, MessagePack, TOML, YAML |
-| `write_record_to_file(path, record)`               | Write single record to file path    | JSON, MessagePack, TOML, YAML |
-| `write_records_to_writer(writer, records, format)` | Write list of records to `BinaryIO` | All formats except for TOML   |
-| `write_records_to_file(path, records)`             | Write list of records to file path  | All formats except for TOML   |
+| Function                                                  | Description                         | Supported Formats             |
+| --------------------------------------------------------- | ----------------------------------- | ----------------------------- |
+| `write_record_to_writer(writer, record, format)`          | Write single record to `BinaryIO`   | JSON, MessagePack, TOML, YAML |
+| `write_record_to_file(path, record, data_format=None)`    | Write single record to file path    | JSON, MessagePack, TOML, YAML |
+| `write_records_to_writer(writer, records, format)`        | Write list of records to `BinaryIO` | All formats except for TOML   |
+| `write_records_to_file(path, records, data_format=None)`  | Write list of records to file path  | All formats except for TOML   |
 
-### Format Detection
+### Format Specification
 
-When using `*_from_file` or `*_to_file` functions, the data format is automatically detected from the file extension:
+When using `*_from_file` or `*_to_file` functions, you can optionally specify the data format explicitly using the `data_format` parameter. If not specified, the format is automatically detected from the file extension.
 
 ```python
 from pydanticio import read_records_from_file, write_records_to_file
@@ -105,9 +108,60 @@ from pydanticio import read_records_from_file, write_records_to_file
 # Auto-detects CSV format from .csv extension
 users = read_records_from_file("data/users.csv", User)
 
-# Auto-detects JSON Lines format from .jsonl extension
-write_records_to_file("data/output.jsonl", users)
+# Explicit format overrides file extension
+users = read_records_from_file("data/file.xyz", User, data_format="csv")
+write_records_to_file("data/output.txt", users, data_format="json")
 ```
+
+**Valid format values:**
+
+| Value          | Description    |
+| -------------- | -------------- |
+| `"json"`       | JSON format    |
+| `"yaml"`       | YAML format    |
+| `"messagepack"`| MessagePack    |
+| `"toml"`       | TOML format (single record only) |
+| `"csv"`        | CSV format (records only) |
+| `"json_lines"` | JSON Lines format (records only) |
+
+When `data_format` is `None` (default), the format is automatically detected from the file extension. When explicitly specified, it overrides the automatic detection.
+
+### Explicit Format Specification
+
+Use the `data_format` parameter to override automatic format detection from file extensions:
+
+```python
+from pydantic import BaseModel
+from pydanticio import (
+    read_records_from_file,
+    write_records_to_file,
+    read_record_from_file,
+    write_record_to_file,
+)
+
+class User(BaseModel):
+    name: str
+    age: int
+
+# Override file extension - read CSV from .txt file
+users = read_records_from_file("data/users.txt", User, data_format="csv")
+
+# Write JSON to file with non-standard extension
+write_records_to_file("data/export.xyz", users, data_format="json")
+
+# Single record with explicit format
+class Config(BaseModel):
+    setting: str
+    value: int
+
+config = read_record_from_file("config.data", Config, data_format="yaml")
+write_record_to_file("config.out", config, data_format="toml")
+```
+
+This is useful when:
+- Working with files that have non-standard extensions
+- Converting between formats while preserving original file
+- Ensuring consistent format regardless of file naming
 
 ## Examples
 
