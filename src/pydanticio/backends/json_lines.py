@@ -12,7 +12,7 @@ def read_records[T: BaseModel](reader: BinaryIO, model: type[T]) -> list[T]:
 
 
 def write_records(writer: BinaryIO, records: Iterable[BaseModel]) -> None:
-    with managed_text_io(writer, encoding="utf-8") as text_writer:
+    with managed_text_io(writer, encoding="utf-8", newline="\n") as text_writer:
         for record in records:
             text_writer.write(record.model_dump_json())
             text_writer.write("\n")
