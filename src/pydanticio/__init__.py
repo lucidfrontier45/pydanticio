@@ -58,7 +58,10 @@ def read_record_from_reader[T: BaseModel](
                     case "yaml":
                         return yaml_backend.read_record(text_reader, model)
                     case _:
-                        raise ValueError("this won't happen")
+                        # This branch is unreachable due to the outer match
+                        raise ValueError(
+                            f"Unreachable: invalid data_format {data_format}"
+                        )
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -90,7 +93,10 @@ def read_records_from_reader[T: BaseModel](
                     case "yaml":
                         return yaml_backend.read_record(text_reader, list_model).root
                     case _:
-                        raise ValueError("this won't happen")
+                        # This branch is unreachable due to the outer match
+                        raise ValueError(
+                            f"Unreachable: invalid data_format {data_format}"
+                        )
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -117,7 +123,10 @@ def write_record_to_writer(
                     case "yaml":
                         yaml_backend.write_record(text_writer, record)
                     case _:
-                        raise ValueError("this won't happen")
+                        # This branch is unreachable due to the outer match
+                        raise ValueError(
+                            f"Unreachable: invalid data_format {data_format}"
+                        )
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -150,7 +159,10 @@ def write_records_to_writer[T: BaseModel](
                     case "yaml":
                         yaml_backend.write_record(text_writer, list_model(root=records))
                     case _:
-                        raise ValueError("this won't happen")
+                        # This branch is unreachable due to the outer match
+                        raise ValueError(
+                            f"Unreachable: invalid data_format {data_format}"
+                        )
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
