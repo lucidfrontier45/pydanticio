@@ -20,6 +20,8 @@ try:
 except ImportError:
     from .backends import yaml_stub as yaml_backend
 
+from .version import __version__
+
 GenericDataFormat = Literal["json", "yaml", "messagepack"]
 LinesOnlyDataFormat = Literal["csv", "json_lines"]
 DataFormat = GenericDataFormat | LinesOnlyDataFormat
