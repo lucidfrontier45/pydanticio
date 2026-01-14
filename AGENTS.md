@@ -30,7 +30,7 @@ Example: `uv run ruff check`, `uv run pytest`
 Run tests with: `uv run pytest`
 - Tests in `tests/` directory
 - Each backend has its own test file
-- Uses pytest fixtures and StringIO for testing
+- Uses pytest fixtures and BytesIO for testing
 
 ## Linting and Type Checking
 - Linting: `uv run ruff check .`
