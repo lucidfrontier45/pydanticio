@@ -1,4 +1,4 @@
-from io import BytesIO, StringIO
+from io import BytesIO
 
 from pydanticio import (
     read_record_from_reader,
@@ -6,7 +6,6 @@ from pydanticio import (
     read_records_from_reader,
     write_records_to_writer,
 )
-from pydantic import RootModel
 
 from . import TestClass, test_records
 
