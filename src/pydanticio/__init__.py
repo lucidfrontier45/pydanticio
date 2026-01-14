@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from contextlib import contextmanager
 from io import TextIOWrapper
 from pathlib import Path
 from typing import BinaryIO, Literal
@@ -18,6 +19,15 @@ except ImportError:
 GenericDataFormat = Literal["json", "yaml"]
 LinesOnlyDataFormat = Literal["csv", "json_lines"]
 DataFormat = GenericDataFormat | LinesOnlyDataFormat
+
+
+@contextmanager
+def detach_on_exit(wrapper: TextIOWrapper):
+    try:
+        yield wrapper
+    finally:
+        if not wrapper.closed:
+            wrapper.detach()
 
 
 def decide_data_format_from_path(
@@ -41,14 +51,14 @@ def read_record_from_reader[T: BaseModel](
 ) -> T:
     match data_format:
         case "json" | "yaml":
-            text_reader = TextIOWrapper(reader, encoding="utf-8")
-            match data_format:
-                case "json":
-                    return json_backend.read_record(text_reader, model)
-                case "yaml":
-                    return yaml_backend.read_record(text_reader, model)
-                case _:
-                    raise ValueError("this won't happen")
+            with detach_on_exit(TextIOWrapper(reader, encoding="utf-8")) as text_reader:
+                match data_format:
+                    case "json":
+                        return json_backend.read_record(text_reader, model)
+                    case "yaml":
+                        return yaml_backend.read_record(text_reader, model)
+                    case _:
+                        raise ValueError("this won't happen")
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -69,18 +79,18 @@ def read_records_from_reader[T: BaseModel](
     match data_format:
         # text formats only
         case "csv" | "json_lines" | "json" | "yaml":
-            text_reader = TextIOWrapper(reader, encoding="utf-8")
-            match data_format:
-                case "csv":
-                    return csv_backend.read_records(text_reader, model)
-                case "json_lines":
-                    return jsl_backend.read_records(text_reader, model)
-                case "json":
-                    return json_backend.read_record(text_reader, list_model).root
-                case "yaml":
-                    return yaml_backend.read_record(text_reader, list_model).root
-                case _:
-                    raise ValueError("this won't happen")
+            with detach_on_exit(TextIOWrapper(reader, encoding="utf-8")) as text_reader:
+                match data_format:
+                    case "csv":
+                        return csv_backend.read_records(text_reader, model)
+                    case "json_lines":
+                        return jsl_backend.read_records(text_reader, model)
+                    case "json":
+                        return json_backend.read_record(text_reader, list_model).root
+                    case "yaml":
+                        return yaml_backend.read_record(text_reader, list_model).root
+                    case _:
+                        raise ValueError("this won't happen")
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -100,8 +110,7 @@ def write_record_to_writer(
     match data_format:
         # text formats only
         case "json" | "yaml":
-            text_writer = TextIOWrapper(writer, encoding="utf-8", write_through=True)
-            try:
+            with detach_on_exit(TextIOWrapper(writer, encoding="utf-8")) as text_writer:
                 match data_format:
                     case "json":
                         json_backend.write_record(text_writer, record)
@@ -109,8 +118,6 @@ def write_record_to_writer(
                         yaml_backend.write_record(text_writer, record)
                     case _:
                         raise ValueError("this won't happen")
-            finally:
-                text_writer.detach()
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -128,11 +135,11 @@ def write_records_to_writer[T: BaseModel](
     data_format: DataFormat,
 ) -> None:
     list_model = RootModel[Iterable[T]]
+
     match data_format:
         # text formats only
         case "csv" | "json_lines" | "json" | "yaml":
-            text_writer = TextIOWrapper(writer, encoding="utf-8", write_through=True)
-            try:
+            with detach_on_exit(TextIOWrapper(writer, encoding="utf-8")) as text_writer:
                 match data_format:
                     case "csv":
                         csv_backend.write_records(text_writer, records)
@@ -144,8 +151,6 @@ def write_records_to_writer[T: BaseModel](
                         yaml_backend.write_record(text_writer, list_model(root=records))
                     case _:
                         raise ValueError("this won't happen")
-            finally:
-                text_writer.detach()
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
