@@ -2,7 +2,6 @@ from collections.abc import Iterable
 from contextlib import contextmanager
 from io import TextIOWrapper
 from pathlib import Path
-from tokenize import Single
 from typing import BinaryIO, Literal
 
 from pydantic import BaseModel, RootModel
