@@ -27,7 +27,7 @@ pip install pydanticio[yaml]
 - `read_record_from_file` and `read_records_from_file` accept a `Path`. Data format is auto-detected from file extension.
 - `write_*` functions follow the same rules as `read_*`.
 
-Note: CSV and JSON Lines only support lists of records, not single records.
+Note: CSV and JSON Lines only support lists of records, not single records. All text-based formats (CSV, JSON, JSON Lines, YAML) are read from and written to files using UTF-8 encoding.
 
 # Examples
 
