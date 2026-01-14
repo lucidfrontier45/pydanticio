@@ -6,12 +6,15 @@ from pydanticio import read_records_from_reader, write_records_to_writer
 from . import SampleRecord, test_records
 
 
-records_str = "\r\n".join(
-    [
-        test_records[0].get_csv_header(),
-        test_records[0].to_csv_row(),
-        test_records[1].to_csv_row(),
-    ]
+records_str = (
+    "\r\n".join(
+        [
+            test_records[0].get_csv_header(),
+            test_records[0].to_csv_row(),
+            test_records[1].to_csv_row(),
+        ]
+    )
+    + "\r\n"
 )
 
 

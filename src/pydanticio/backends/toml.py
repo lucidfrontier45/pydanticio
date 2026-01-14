@@ -13,6 +13,6 @@ def read_record[T: BaseModel](reader: BinaryIO, model: type[T]) -> T:
 
 
 def write_record(writer: BinaryIO, record: BaseModel) -> None:
-    # Use newline='\n' so output uses LF line endings regardless of platform
+    # Use platform-specific newline to ensure compatibility
     with managed_text_io(writer, encoding="utf-8", newline=PLATFORM_NEWLINE) as text_writer:
         tomlkit.dump(record.model_dump(mode="json"), text_writer)
