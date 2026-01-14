@@ -62,15 +62,18 @@ All text-based formats use UTF-8 encoding.
 
 ### Newline Handling
 
-Text-based formats handle newlines according to their respective specifications:
+All text-based formats handle newlines automatically:
 
-| Format      | Line Ending | Notes                              |
-| ----------- | ----------- | ---------------------------------- |
-| CSV         | `\r\n`      | Uses CRLF per RFC 4180             |
-| JSON        | `\n`        | Uses LF line endings               |
-| JSON Lines  | `\n`        | Uses LF line endings per RFC 7464  |
-| TOML        | Platform    | Uses default TextIOWrapper behavior |
-| YAML        | `\n`        | Uses LF line endings               |
+- **On read**: Any newline style (`\n`, `\r\n`, or `\r`) is accepted and normalized
+- **On write**: Each format uses its appropriate line ending per specification
+
+| Format     | Line Ending | Notes    |
+| ---------- | ----------- | -------- |
+| CSV        | `\r\n`      | RFC 4180 |
+| JSON       | `\n`        |          |
+| JSON Lines | `\n`        | RFC 7464 |
+| TOML       | Platform    |          |
+| YAML       | `\n`        |          |
 
 ## API Reference
 
