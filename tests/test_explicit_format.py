@@ -111,5 +111,3 @@ def test_backward_compatibility_no_format():
         write_record_to_file(output_path, record)
         result = read_record_from_file(output_path, SampleRecord)
         assert result == record
-        temp_path.unlink(missing_ok=True)
-        output_path.unlink(missing_ok=True)
