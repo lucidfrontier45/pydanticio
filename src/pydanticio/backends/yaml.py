@@ -7,7 +7,7 @@ from ..utils import managed_text_io
 
 
 def read_record[T: BaseModel](reader: BinaryIO, model: type[T]) -> T:
-    with managed_text_io(reader, encoding="utf-8", newline="\n") as text_reader:
+    with managed_text_io(reader, encoding="utf-8") as text_reader:
         data = yaml.safe_load(text_reader)
         return model.model_validate(data)
 

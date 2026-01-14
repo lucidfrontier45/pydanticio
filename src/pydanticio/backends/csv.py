@@ -8,8 +8,7 @@ from ..utils import managed_text_io
 
 
 def read_records[T: BaseModel](reader: BinaryIO, model: type[T]) -> list[T]:
-    # Use newline='' so the csv module can handle newlines correctly
-    with managed_text_io(reader, encoding="utf-8", newline="") as text_reader:
+    with managed_text_io(reader, encoding="utf-8") as text_reader:
         csv_reader = csv.DictReader(text_reader)
         return [model.model_validate(row) for row in csv_reader]
 

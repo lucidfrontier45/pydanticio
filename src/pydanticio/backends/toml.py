@@ -7,8 +7,7 @@ from ..utils import managed_text_io
 
 
 def read_record[T: BaseModel](reader: BinaryIO, model: type[T]) -> T:
-    # Use newline='\n' to normalize to LF when reading textual formats
-    with managed_text_io(reader, encoding="utf-8", newline="") as text_reader:
+    with managed_text_io(reader, encoding="utf-8") as text_reader:
         data = tomlkit.load(text_reader)
         return model.model_validate(data)
 
