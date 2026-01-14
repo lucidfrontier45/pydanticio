@@ -1,6 +1,4 @@
 from collections.abc import Iterable
-from contextlib import contextmanager
-from io import TextIOWrapper
 from pathlib import Path
 from typing import BinaryIO, Literal
 
@@ -32,15 +30,6 @@ SingleOnlyDataFormat = Literal["toml"]
 LinesOnlyDataFormat = Literal["csv", "json_lines"]
 
 
-@contextmanager
-def detach_on_exit(wrapper: TextIOWrapper):
-    try:
-        yield wrapper
-    finally:
-        if not wrapper.closed:
-            wrapper.detach()
-
-
 def decide_data_format_from_path(
     file_path: Path,
 ) -> GenericDataFormat | SingleOnlyDataFormat | LinesOnlyDataFormat:
@@ -65,19 +54,12 @@ def read_record_from_reader[T: BaseModel](
     reader: BinaryIO, model: type[T], data_format: GenericDataFormat | SingleOnlyDataFormat
 ) -> T:
     match data_format:
-        case "json" | "yaml" | "toml":
-            with detach_on_exit(
-                TextIOWrapper(reader, encoding="utf-8", newline="\n")
-            ) as text_reader:
-                match data_format:
-                    case "json":
-                        return json_backend.read_record(text_reader, model)
-                    case "yaml":
-                        return yaml_backend.read_record(text_reader, model)
-                    case "toml":
-                        return toml_backend.read_record(text_reader, model)
-                    case _:
-                        raise ValueError(f"Unreachable: invalid data_format {data_format}")
+        case "json":
+            return json_backend.read_record(reader, model)
+        case "yaml":
+            return yaml_backend.read_record(reader, model)
+        case "toml":
+            return toml_backend.read_record(reader, model)
         case "messagepack":
             return messagepack_backend.read_record(reader, model)
         case _:
@@ -106,21 +88,14 @@ def read_records_from_reader[T: BaseModel](
 ) -> list[T]:
     list_model = RootModel[list[model]]
     match data_format:
-        case "csv" | "json_lines" | "json" | "yaml":
-            with detach_on_exit(
-                TextIOWrapper(reader, encoding="utf-8", newline="\n")
-            ) as text_reader:
-                match data_format:
-                    case "csv":
-                        return csv_backend.read_records(text_reader, model)
-                    case "json_lines":
-                        return jsl_backend.read_records(text_reader, model)
-                    case "json":
-                        return json_backend.read_record(text_reader, list_model).root
-                    case "yaml":
-                        return yaml_backend.read_record(text_reader, list_model).root
-                    case _:
-                        raise ValueError(f"Unreachable: invalid data_format {data_format}")
+        case "csv":
+            return csv_backend.read_records(reader, model)
+        case "json_lines":
+            return jsl_backend.read_records(reader, model)
+        case "json":
+            return json_backend.read_record(reader, list_model).root
+        case "yaml":
+            return yaml_backend.read_record(reader, list_model).root
         case "messagepack":
             return messagepack_backend.read_records(reader, model)
         case _:
@@ -146,19 +121,12 @@ def write_record_to_writer(
     writer: BinaryIO, record: BaseModel, data_format: GenericDataFormat | SingleOnlyDataFormat
 ) -> None:
     match data_format:
-        case "json" | "yaml" | "toml":
-            with detach_on_exit(
-                TextIOWrapper(writer, encoding="utf-8", newline="\n")
-            ) as text_writer:
-                match data_format:
-                    case "json":
-                        json_backend.write_record(text_writer, record)
-                    case "yaml":
-                        yaml_backend.write_record(text_writer, record)
-                    case "toml":
-                        toml_backend.write_record(text_writer, record)
-                    case _:
-                        raise ValueError(f"Unreachable: invalid data_format {data_format}")
+        case "json":
+            json_backend.write_record(writer, record)
+        case "yaml":
+            yaml_backend.write_record(writer, record)
+        case "toml":
+            toml_backend.write_record(writer, record)
         case "messagepack":
             messagepack_backend.write_record(writer, record)
         case _:
@@ -188,21 +156,14 @@ def write_records_to_writer[T: BaseModel](
     list_model = RootModel[Iterable[T]]
 
     match data_format:
-        case "csv" | "json_lines" | "json" | "yaml":
-            with detach_on_exit(
-                TextIOWrapper(writer, encoding="utf-8", newline="\n")
-            ) as text_writer:
-                match data_format:
-                    case "csv":
-                        csv_backend.write_records(text_writer, records)
-                    case "json_lines":
-                        jsl_backend.write_records(text_writer, records)
-                    case "json":
-                        json_backend.write_record(text_writer, list_model(root=records))
-                    case "yaml":
-                        yaml_backend.write_record(text_writer, list_model(root=records))
-                    case _:
-                        raise ValueError(f"Unreachable: invalid data_format {data_format}")
+        case "csv":
+            csv_backend.write_records(writer, records)
+        case "json_lines":
+            jsl_backend.write_records(writer, records)
+        case "json":
+            json_backend.write_record(writer, list_model(root=records))
+        case "yaml":
+            yaml_backend.write_record(writer, list_model(root=records))
         case "messagepack":
             messagepack_backend.write_records(writer, list(records))
         case _:

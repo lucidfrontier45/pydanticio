@@ -1,8 +1,6 @@
 import os
 from pydantic import BaseModel, ConfigDict
 
-PLATFORM_NEWLINE = "\r\n" if os.name == "nt" else "\n"
-
 
 class SampleRecord(BaseModel):
     model_config = ConfigDict(frozen=True)
