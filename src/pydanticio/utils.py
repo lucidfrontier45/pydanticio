@@ -13,4 +13,5 @@ def managed_text_io(binary_io: BinaryIO, encoding: str = "utf-8", newline: str |
         yield wrapper
     finally:
         if not wrapper.closed:
+            wrapper.flush()
             wrapper.detach()
