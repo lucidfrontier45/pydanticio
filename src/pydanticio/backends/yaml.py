@@ -1,17 +1,21 @@
-from typing import BinaryIO
 
 import yaml
-from pydantic import BaseModel
 
+from ..adapters import ListFormatAdapter
+from ..registry import register_backend
 from ..utils import managed_text_io
 
 
-def read_record[T: BaseModel](reader: BinaryIO, model: type[T]) -> T:
-    with managed_text_io(reader, encoding="utf-8") as text_reader:
-        data = yaml.safe_load(text_reader)
-        return model.model_validate(data)
+@register_backend("yaml", [".yaml", ".yml"])
+class YAMLBackend(ListFormatAdapter):
+    def __init__(self):
+        super().__init__(self._read_record_impl, self._write_record_impl)
 
+    def _read_record_impl(self, reader, model):
+        with managed_text_io(reader, encoding="utf-8") as text_reader:
+            data = yaml.safe_load(text_reader)
+            return model.model_validate(data)
 
-def write_record(writer: BinaryIO, record: BaseModel) -> None:
-    with managed_text_io(writer, encoding="utf-8", newline="") as text_writer:
-        yaml.safe_dump(record.model_dump(mode="json"), text_writer, line_break="\n")
+    def _write_record_impl(self, writer, record):
+        with managed_text_io(writer, encoding="utf-8", newline="") as text_writer:
+            yaml.safe_dump(record.model_dump(mode="json"), text_writer, line_break="\n")

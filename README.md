@@ -13,6 +13,7 @@ A tiny file IO utility library for Python powered by [Pydantic](https://docs.pyd
 - **Auto-detection**: Automatically detects format from file extension
 - **Simple API**: Intuitive functions for single records and lists
 - **Zero dependencies**: Core library only requires Pydantic
+- **Extensible**: Registry-based backend system allows custom format support
 
 ## Installation
 

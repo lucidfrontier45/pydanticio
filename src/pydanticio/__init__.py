@@ -1,82 +1,71 @@
 from collections.abc import Iterable
 from pathlib import Path
-from typing import BinaryIO, Literal
+from typing import BinaryIO
 
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel
 
-from .backends import csv as csv_backend
-from .backends import json as json_backend
-from .backends import json_lines as jsl_backend
+# Import backends - they register themselves
+from .backends import csv, json, json_lines
+
+# Optional dependencies with better error handling
+try:
+    from .backends import yaml
+except ImportError:
+    yaml = None
 
 try:
-    from .backends import messagepack as messagepack_backend
+    from .backends import messagepack
 except ImportError:
-    from .backends import messagepack_stub as messagepack_backend
+    messagepack = None
 
 try:
-    from .backends import yaml as yaml_backend
+    from .backends import toml
 except ImportError:
-    from .backends import yaml_stub as yaml_backend
+    toml = None
 
-try:
-    from .backends import toml as toml_backend
-except ImportError:
-    from .backends import toml_stub as toml_backend
-
+from .registry import REGISTRY
 from .version import __version__
 
-GenericDataFormat = Literal["json", "yaml", "messagepack"]
-SingleOnlyDataFormat = Literal["toml"]
-LinesOnlyDataFormat = Literal["csv", "json_lines"]
+# Flexible string-based type system
+DataFormat = str
 
 
-def decide_data_format_from_path(
-    file_path: Path,
-) -> GenericDataFormat | SingleOnlyDataFormat | LinesOnlyDataFormat:
-    match file_path.suffix.lower():
-        case ".csv":
-            return "csv"
-        case ".jsonl" | ".jsl" | ".jl" | ".json_lines":
-            return "json_lines"
-        case ".json":
-            return "json"
-        case ".yaml" | ".yml":
-            return "yaml"
-        case ".msgpack":
-            return "messagepack"
-        case ".toml":
-            return "toml"
-        case _:
-            raise ValueError(f"Unsupported file extension: {file_path.suffix}")
+def decide_data_format_from_path(file_path: Path) -> str:
+    extension = file_path.suffix.lower()
+    try:
+        return REGISTRY.get_format_from_extension(extension)
+    except ValueError as e:
+        # Add installation suggestions for missing optional backends
+        msg = str(e)
+        if extension in [".yaml", ".yml"] and yaml is None:
+            msg += " Install with: pip install pydanticio[yaml]"
+        elif extension == ".msgpack" and messagepack is None:
+            msg += " Install with: pip install pydanticio[msgpack]"
+        elif extension == ".toml" and toml is None:
+            msg += " Install with: pip install pydanticio[toml]"
+        raise ValueError(msg) from e
 
 
-def read_record_from_reader[T: BaseModel](
-    reader: BinaryIO, model: type[T], data_format: GenericDataFormat | SingleOnlyDataFormat
-) -> T:
-    match data_format:
-        case "json":
-            return json_backend.read_record(reader, model)
-        case "yaml":
-            return yaml_backend.read_record(reader, model)
-        case "toml":
-            return toml_backend.read_record(reader, model)
-        case "messagepack":
-            return messagepack_backend.read_record(reader, model)
-        case _:
-            raise ValueError(f"Unsupported backend type: {data_format}")
+def read_record_from_reader[T: BaseModel](reader: BinaryIO, model: type[T], data_format: str) -> T:
+    backend = REGISTRY.get_backend(data_format)
+    return backend.read_record(reader, model)
 
 
 def read_record_from_file[T: BaseModel](
     file_path: str | Path,
     model: type[T],
-    data_format: GenericDataFormat | SingleOnlyDataFormat | None = None,
+    data_format: str | None = None,
 ) -> T:
     file_path = Path(file_path)
     actual_data_format = data_format or decide_data_format_from_path(file_path)
-    if actual_data_format in ("csv", "json_lines"):
+
+    # Check backend capabilities by testing if it raises NotImplementedError
+    backend = REGISTRY.get_backend(actual_data_format)
+    if not hasattr(backend, "read_record"):
         raise ValueError(
-            f"Data format {actual_data_format} is not supported for single record reading"
-        )
+            f"Backend '{actual_data_format}' does not support single record operations"
+        ) from None
+
     with file_path.open("rb") as reader:
         return read_record_from_reader(reader, model, actual_data_format)
 
@@ -84,66 +73,51 @@ def read_record_from_file[T: BaseModel](
 def read_records_from_reader[T: BaseModel](
     reader: BinaryIO,
     model: type[T],
-    data_format: GenericDataFormat | LinesOnlyDataFormat,
+    data_format: str,
 ) -> list[T]:
-    list_model = RootModel[list[model]]
-    match data_format:
-        case "csv":
-            return csv_backend.read_records(reader, model)
-        case "json_lines":
-            return jsl_backend.read_records(reader, model)
-        case "json":
-            return json_backend.read_record(reader, list_model).root
-        case "yaml":
-            return yaml_backend.read_record(reader, list_model).root
-        case "messagepack":
-            return messagepack_backend.read_records(reader, model)
-        case _:
-            raise ValueError(f"Unsupported backend type: {data_format}")
+    backend = REGISTRY.get_backend(data_format)
+    return backend.read_records(reader, model)
 
 
 def read_records_from_file[T: BaseModel](
     file_path: str | Path,
     model: type[T],
-    data_format: GenericDataFormat | LinesOnlyDataFormat | None = None,
+    data_format: str | None = None,
 ) -> list[T]:
     file_path = Path(file_path)
     actual_data_format = data_format or decide_data_format_from_path(file_path)
-    if actual_data_format in ("toml",):
+
+    # Check backend capabilities by testing if it raises NotImplementedError
+    backend = REGISTRY.get_backend(actual_data_format)
+    if not hasattr(backend, "read_records"):
         raise ValueError(
-            f"Data format {actual_data_format} is not supported for multiple record reading"
-        )
+            f"Backend '{actual_data_format}' does not support multiple record operations"
+        ) from None
+
     with file_path.open("rb") as reader:
         return read_records_from_reader(reader, model, actual_data_format)
 
 
-def write_record_to_writer(
-    writer: BinaryIO, record: BaseModel, data_format: GenericDataFormat | SingleOnlyDataFormat
-) -> None:
-    match data_format:
-        case "json":
-            json_backend.write_record(writer, record)
-        case "yaml":
-            yaml_backend.write_record(writer, record)
-        case "toml":
-            toml_backend.write_record(writer, record)
-        case "messagepack":
-            messagepack_backend.write_record(writer, record)
-        case _:
-            raise ValueError(f"Unsupported backend type: {data_format}")
+def write_record_to_writer(writer: BinaryIO, record: BaseModel, data_format: str) -> None:
+    backend = REGISTRY.get_backend(data_format)
+    backend.write_record(writer, record)
 
 
 def write_record_to_file(
     file_path: str | Path,
     record: BaseModel,
-    data_format: GenericDataFormat | SingleOnlyDataFormat | None = None,
+    data_format: str | None = None,
 ) -> None:
     file_path = Path(file_path)
     actual_data_format = data_format or decide_data_format_from_path(file_path)
-    if actual_data_format in ("csv", "json_lines"):
+
+    # Check backend capabilities by testing if it raises NotImplementedError
+    backend = REGISTRY.get_backend(actual_data_format)
+    if not hasattr(backend, "write_record"):
         raise ValueError(
-            f"Data format {actual_data_format} is not supported for single record writing"
-        )
+            f"Backend '{actual_data_format}' does not support single record operations"
+        ) from None
+
     with file_path.open("wb") as writer:
         write_record_to_writer(writer, record, actual_data_format)
 
@@ -151,35 +125,26 @@ def write_record_to_file(
 def write_records_to_writer[T: BaseModel](
     writer: BinaryIO,
     records: Iterable[T],
-    data_format: GenericDataFormat | LinesOnlyDataFormat,
+    data_format: str,
 ) -> None:
-    list_model = RootModel[Iterable[T]]
-
-    match data_format:
-        case "csv":
-            csv_backend.write_records(writer, records)
-        case "json_lines":
-            jsl_backend.write_records(writer, records)
-        case "json":
-            json_backend.write_record(writer, list_model(root=records))
-        case "yaml":
-            yaml_backend.write_record(writer, list_model(root=records))
-        case "messagepack":
-            messagepack_backend.write_records(writer, list(records))
-        case _:
-            raise ValueError(f"Unsupported backend type: {data_format}")
+    backend = REGISTRY.get_backend(data_format)
+    backend.write_records(writer, records)
 
 
 def write_records_to_file(
     file_path: str | Path,
     records: Iterable[BaseModel],
-    data_format: GenericDataFormat | LinesOnlyDataFormat | None = None,
+    data_format: str | None = None,
 ) -> None:
     file_path = Path(file_path)
     actual_data_format = data_format or decide_data_format_from_path(file_path)
-    if actual_data_format in ("toml",):
+
+    # Check backend capabilities by testing if it raises NotImplementedError
+    backend = REGISTRY.get_backend(actual_data_format)
+    if not hasattr(backend, "write_records"):
         raise ValueError(
-            f"Data format {actual_data_format} is not supported for multiple record writing"
-        )
+            f"Backend '{actual_data_format}' does not support multiple record operations"
+        ) from None
+
     with file_path.open("wb") as writer:
         write_records_to_writer(writer, records, actual_data_format)
