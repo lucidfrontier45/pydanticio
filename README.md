@@ -138,6 +138,7 @@ write_records_to_file("data/output.txt", users, data_format="json")
 | `"json"`        | JSON format                      |
 | `"yaml"`        | YAML format                      |
 | `"messagepack"` | MessagePack                      |
+| `"cbor"`        | CBOR format                      |
 | `"toml"`        | TOML format (single record only) |
 | `"csv"`         | CSV format (records only)        |
 | `"json_lines"`  | JSON Lines format (records only) |
