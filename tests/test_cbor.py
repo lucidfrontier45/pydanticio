@@ -6,34 +6,34 @@ from pydanticio import (
     read_records_from_reader,
     write_records_to_writer,
 )
-import msgpack
+import cbor2
 
 from . import SampleRecord, test_records
 
 
 def test_read_record_from_reader():
-    data = msgpack.packb(test_records[0].model_dump(mode="json"))
+    data = cbor2.dumps(test_records[0].model_dump(mode="json"), canonical=True)
     reader = BytesIO(data)  # type: ignore
-    record = read_record_from_reader(reader, SampleRecord, "messagepack")
+    record = read_record_from_reader(reader, SampleRecord, "cbor")
     assert record == test_records[0]
 
 
 def test_read_list_of_records_from_reader():
-    data = msgpack.packb([record.model_dump(mode="json") for record in test_records])
+    data = cbor2.dumps([record.model_dump(mode="json") for record in test_records], canonical=True)
     reader = BytesIO(data)  # type: ignore
-    records = read_records_from_reader(reader, SampleRecord, "messagepack")
+    records = read_records_from_reader(reader, SampleRecord, "cbor")
     assert records == test_records
 
 
 def test_write_record_to_writer():
-    data = msgpack.packb(test_records[0].model_dump(mode="json"))
+    data = cbor2.dumps(test_records[0].model_dump(mode="json"), canonical=True)
     writer = BytesIO()
-    write_record_to_writer(writer, test_records[0], "messagepack")
+    write_record_to_writer(writer, test_records[0], "cbor")
     assert writer.getvalue() == data
 
 
 def test_write_list_of_records_to_writer():
-    data = msgpack.packb([record.model_dump(mode="json") for record in test_records])  # type: ignore
+    data = cbor2.dumps([record.model_dump(mode="json") for record in test_records], canonical=True)  # type: ignore
     writer = BytesIO()
-    write_records_to_writer(writer, test_records, "messagepack")
+    write_records_to_writer(writer, test_records, "cbor")
     assert writer.getvalue() == data

@@ -25,7 +25,7 @@ The Project is managed by `uv`. Run tools via `uv run`.
 
 ### Pydantic Patterns
 - Use `model_validate()` for parsing data into models
-- Use `model_dump()` for converting models to dictionaries
+- Use `model_dump(mode="json")` for converting models to dictionaries
 - Use `model_dump_json()` for converting models to JSON strings
 
 ### Backend Pattern

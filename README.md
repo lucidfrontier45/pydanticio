@@ -9,7 +9,7 @@ A tiny file IO utility library for Python powered by [Pydantic](https://docs.pyd
 ## Features
 
 - **Type-safe**: Read and write Pydantic models with full type inference
-- **Format support**: CSV, JSON, JSON Lines, TOML, YAML, and MessagePack (optional)
+- **Format support**: CSV, JSON, JSON Lines, TOML, YAML, MessagePack, and CBOR (optional)
 - **Auto-detection**: Automatically detects format from file extension
 - **Simple API**: Intuitive functions for single records and lists
 - **Zero dependencies**: Core library only requires Pydantic
@@ -28,6 +28,9 @@ pip install pydanticio[messagepack]
 
 # With TOML support
 pip install pydanticio[toml]
+
+# With CBOR support
+pip install pydanticio[cbor]
 ```
 
 ## Quick Start
@@ -58,6 +61,7 @@ write_records_to_file("output.json", users)
 | JSON        | `.json`                                | Yes           | Yes             |
 | JSON Lines  | `.jsonl`, `.jl`, `.jsl`, `.json_lines` | No            | Yes             |
 | MessagePack | `.msgpack`                             | Yes           | Yes             |
+| CBOR        | `.cbor`                                | Yes           | Yes             |
 | TOML        | `.toml`                                | Yes           | No              |
 | YAML        | `.yaml`, `.yml`                        | Yes           | Yes             |
 
@@ -84,8 +88,8 @@ All text-based formats handle newlines automatically:
 
 | Function                                                 | Description                          | Supported Formats             |
 | -------------------------------------------------------- | ------------------------------------ | ----------------------------- |
-| `read_record_from_reader(reader, model, format)`         | Read single record from `BinaryIO`   | JSON, MessagePack, TOML, YAML |
-| `read_record_from_file(path, model, data_format=None)`   | Read single record from file path    | JSON, MessagePack, TOML, YAML |
+| `read_record_from_reader(reader, model, format)`         | Read single record from `BinaryIO`   | JSON, MessagePack, CBOR, TOML, YAML |
+| `read_record_from_file(path, model, data_format=None)`   | Read single record from file path    | JSON, MessagePack, CBOR, TOML, YAML |
 | `read_records_from_reader(reader, model, format)`        | Read list of records from `BinaryIO` | All formats except for TOML   |
 | `read_records_from_file(path, model, data_format=None)`  | Read list of records from file path  | All formats except for TOML   |
 
@@ -93,8 +97,8 @@ All text-based formats handle newlines automatically:
 
 | Function                                                  | Description                         | Supported Formats             |
 | --------------------------------------------------------- | ----------------------------------- | ----------------------------- |
-| `write_record_to_writer(writer, record, format)`          | Write single record to `BinaryIO`   | JSON, MessagePack, TOML, YAML |
-| `write_record_to_file(path, record, data_format=None)`    | Write single record to file path    | JSON, MessagePack, TOML, YAML |
+| `write_record_to_writer(writer, record, format)`          | Write single record to `BinaryIO`   | JSON, MessagePack, CBOR, TOML, YAML |
+| `write_record_to_file(path, record, data_format=None)`    | Write single record to file path    | JSON, MessagePack, CBOR, TOML, YAML |
 | `write_records_to_writer(writer, records, format)`        | Write list of records to `BinaryIO` | All formats except for TOML   |
 | `write_records_to_file(path, records, data_format=None)`  | Write list of records to file path  | All formats except for TOML   |
 

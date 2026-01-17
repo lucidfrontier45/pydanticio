@@ -26,6 +26,9 @@ keywords = ["pydantic", "io", "file", "utility", "library"]
 yaml = ["pyyaml>=5.1.0"]
 messagepack = ["msgpack>=1.1.2"]
 toml = ["tomlkit>=0.14.0"]
+cbor = [
+    "cbor2>=5.8.0",
+]
 
 [dependency-groups]
 dev = [

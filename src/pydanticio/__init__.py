@@ -23,9 +23,14 @@ try:
 except ImportError:
     from .backends import toml_stub as toml_backend
 
+try:
+    from .backends import cbor as cbor_backend
+except ImportError:
+    from .backends import cbor_stub as cbor_backend
+
 from .version import __version__
 
-GenericDataFormat = Literal["json", "yaml", "messagepack"]
+GenericDataFormat = Literal["json", "yaml", "messagepack", "cbor"]
 SingleOnlyDataFormat = Literal["toml"]
 LinesOnlyDataFormat = Literal["csv", "json_lines"]
 
@@ -44,6 +49,8 @@ def decide_data_format_from_path(
             return "yaml"
         case ".msgpack":
             return "messagepack"
+        case ".cbor":
+            return "cbor"
         case ".toml":
             return "toml"
         case _:
@@ -62,6 +69,8 @@ def read_record_from_reader[T: BaseModel](
             return toml_backend.read_record(reader, model)
         case "messagepack":
             return messagepack_backend.read_record(reader, model)
+        case "cbor":
+            return cbor_backend.read_record(reader, model)
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -98,6 +107,8 @@ def read_records_from_reader[T: BaseModel](
             return yaml_backend.read_record(reader, list_model).root
         case "messagepack":
             return messagepack_backend.read_records(reader, model)
+        case "cbor":
+            return cbor_backend.read_records(reader, model)
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -129,6 +140,8 @@ def write_record_to_writer(
             toml_backend.write_record(writer, record)
         case "messagepack":
             messagepack_backend.write_record(writer, record)
+        case "cbor":
+            cbor_backend.write_record(writer, record)
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
@@ -166,6 +179,8 @@ def write_records_to_writer[T: BaseModel](
             yaml_backend.write_record(writer, list_model(root=records))
         case "messagepack":
             messagepack_backend.write_records(writer, list(records))
+        case "cbor":
+            cbor_backend.write_records(writer, list(records))
         case _:
             raise ValueError(f"Unsupported backend type: {data_format}")
 
