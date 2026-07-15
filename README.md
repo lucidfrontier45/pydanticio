@@ -243,6 +243,10 @@ python examples/convert_format.py input.csv output.json
 
 See `examples/convert_format.py` for the full source code.
 
+## Coding Agent Skill
+
+This repo ships an agent skill at [`skills/pydanticio-api/SKILL.md`](skills/pydanticio-api/SKILL.md) that teaches AI coding assistants the full `pydanticio` API surface, format support matrix, and decision rules. Install it into a skill-capable agent (e.g. [pi](https://github.com/earendil-works/pi-coding-agent)) to get type-safe Pydantic file I/O generated correctly without hallucinated functions.
+
 ## Requirements
 
 - Python 3.12+
